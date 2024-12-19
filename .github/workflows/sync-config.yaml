@@ -1,9 +1,14 @@
+```yaml
 name: Sync GitHub Configuration
 
 on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   sync:
@@ -123,7 +128,7 @@ jobs:
           rm -rf temp_github
           
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
           
       - name: Create Pull Request
         if: env.has_changes == 'true'
@@ -163,4 +168,4 @@ jobs:
             --base main \
             --head $branch_name
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
