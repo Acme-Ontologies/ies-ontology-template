@@ -1,0 +1,142 @@
+= IES [INSERT NAME] Ontology
+
+image::assets/images/ies-logo.png[]
+
+== Overview
+This repository contains the development artifacts for an IES ontology project. It follows the standard IES ontology development repository structure and incorporates shared IES tools and GitHub workflows.
+
+== Repository Structure
+The repository follows the IES standardized structure for ontology development:
+
+* `.github/` - GitHub workflows and issue templates (added via submodule)
+* `assets/` - Project assets like images and logos
+* `build/` - Build artifacts and outputs
+* `docs/` - Project documentation
+** `diagrams/` - Ontology diagrams and visualizations
+** `exemplars/` - Example usage and patterns
+** `specifications/` - Formal specifications
+* `imports/` - Imported ontologies and dependencies
+* `src/` - Source files
+** `competencies/` - Competency questions in SPARQL
+** `data/` - Source data files
+** `ontology/` - Ontology source files
+* `tests/` - Test suites
+** `integration/` - Integration tests
+** `unit/` - Unit tests
+** `validation/` - Validation tests and shapes
+* `tools/` - Development tools (added via submodule)
+
+== Initial Setup
+Follow these steps to set up a new ontology repository:
+
+1. Create a new repository from the IES Ontology template (link:https://github.com/aigora-de/ies-ontology-template[IES Ontology Template]).
+2. Add required submodules for IES GitHub config and tools:
++
+[source,bash]
+----
+# Add IES GitHub configuration (workflows and templates)
+git submodule add git@github.com:aigora-de/ies-github-config.git .github
+
+# Add IES ontology development tools
+git submodule add git@github.com:aigora-de/ies-tools.git tools/ies-tools
+
+# Initialize submodules
+git submodule update --init
+----
+
+3. Set up Python environment for tools:
++
+[source,bash]
+----
+cd tools/ies-tools
+poetry install
+----
+
+4. Verify setup:
++
+[source,bash]
+----
+poetry run gh-tool --help
+----
+
+== Development Workflow
+
+=== Creating Issues
+Use the provided tools to create standardized issues:
+
+[source,bash]
+----
+# Create a feature request
+poetry run gh-tool create-feature
+
+# Create a bug report
+poetry run gh-tool create-bug
+
+# Create a documentation task
+poetry run gh-tool create-docs-task
+----
+
+=== Pull Requests
+Create pull requests using the provided tool:
+
+[source,bash]
+----
+poetry run gh-tool create-pr
+----
+
+=== Updating Tools
+When updates are available in the submodule repositories:
+
+[source,bash]
+----
+# Update submodules to latest version
+git submodule update --remote
+git commit -am "Update GitHub config and tools"
+git push
+----
+
+== For New Team Members
+
+=== Initial Clone
+When cloning this repository for the first time:
+
+[source,bash]
+----
+# Clone with submodules
+git clone --recurse-submodules <repo-url>
+
+# Or after a regular clone
+git clone <repo-url>
+git submodule update --init
+----
+
+=== Tool Setup
+Set up the development tools:
+
+[source,bash]
+----
+cd tools/ies-tools
+poetry install
+----
+
+== GitHub Workflows
+The following workflows are available through the `.github` submodule:
+
+* Feature Request Workflow - Handles creation and tracking of feature requests
+* Bug Report Workflow - Manages bug reports and fixes
+* Documentation Workflow - Coordinates documentation tasks
+* Pull Request Workflow - Automates PR reviews and merges
+
+See the link:.github/README.adoc[GitHub Configuration README] for detailed information about available workflows and templates.
+
+== Contributing
+Please see link:docs/CONTRIBUTING.adoc[Contributing Guide] for guidelines on how to contribute to this ontology project.
+
+== License
+This ontology repository is licensed under the MIT License. See link:LICENSE[LICENSE] for details.
+
+== Changelog
+See link:CHANGELOG.adoc[CHANGELOG] for a list of changes in each release.
+
+== Version
+Current version information is maintained in the link:VERSION[VERSION] file.
