@@ -1,0 +1,113 @@
+name: Sync Workflows
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout consuming repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          
+      - name: Sync workflows
+        run: |
+          # Create temp directory for new workflows
+          mkdir -p temp_workflows
+          
+          # Get list of workflows from config repo
+          config_workflows=$(gh api /repos/aigora-de/github-config/contents/.github/workflows \
+            --jq '.[].name' \
+            --header "Accept: application/vnd.github.v3+json")
+            
+          # Download all workflows from config repo to temp directory
+          for workflow in $config_workflows; do
+            echo "Downloading $workflow"
+            gh api /repos/aigora-de/github-config/contents/.github/workflows/$workflow \
+              --header "Accept: application/vnd.github.raw" \
+              > temp_workflows/$workflow
+          done
+          
+          # Create workflows directory if it doesn't exist
+          mkdir -p .github/workflows
+          
+          # Get list of existing workflows in consuming repo
+          existing_workflows=$(ls .github/workflows/ 2>/dev/null || echo "")
+          
+          # Compare directories to detect changes
+          changes_detected=false
+          
+          # Check for new or modified files
+          for workflow in $config_workflows; do
+            if [ ! -f ".github/workflows/$workflow" ] || \
+               ! cmp -s "temp_workflows/$workflow" ".github/workflows/$workflow"; then
+              changes_detected=true
+              echo "Change detected in $workflow"
+            fi
+          done
+          
+          # Check for deleted files
+          for workflow in $existing_workflows; do
+            if [ ! -f "temp_workflows/$workflow" ]; then
+              changes_detected=true
+              echo "Workflow $workflow has been deleted in config repo"
+            fi
+          done
+          
+          # If changes detected, replace workflows directory
+          if [ "$changes_detected" = true ]; then
+            rm -rf .github/workflows/
+            mv temp_workflows .github/workflows
+            echo "has_changes=true" >> $GITHUB_ENV
+          else
+            rm -rf temp_workflows
+            echo "has_changes=false" >> $GITHUB_ENV
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create Pull Request
+        if: env.has_changes == 'true'
+        run: |
+          # Configure git
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Create a new branch
+          branch_name="sync-workflows-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $branch_name
+          
+          # Get list of current workflows
+          current_workflows=$(ls .github/workflows/ 2>/dev/null || echo "")
+          
+          # Create detailed PR description
+          pr_body="Automated PR to sync workflow files from the config repository.\n\n"
+          pr_body+="## Changes\n"
+          
+          # Compare with previous commit to list changes
+          git add .github/workflows/
+          changes=$(git diff --cached --name-status)
+          
+          while read -r status file; do
+            case $status in
+              A) pr_body+="✨ Added: ${file##*/}\n" ;;
+              M) pr_body+="📝 Modified: ${file##*/}\n" ;;
+              D) pr_body+="🗑️ Deleted: ${file##*/}\n" ;;
+            esac
+          done <<< "$changes"
+          
+          # Commit and create PR
+          git commit -m "Sync workflows from config repo"
+          git push origin $branch_name
+          
+          gh pr create \
+            --title "📦 Sync workflows from config repo" \
+            --body "$pr_body" \
+            --base main \
+            --head $branch_name
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
