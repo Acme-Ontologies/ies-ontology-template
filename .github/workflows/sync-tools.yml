@@ -22,13 +22,13 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
+      GH_TOKEN: ${{ secrets.ACME-ONTOLOGIES-PAT }}
     steps:
       - name: Checkout consuming repository
         uses: actions/checkout@v4
         with:
           ref: main
-          token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
+          token: ${{ secrets.ACME-ONTOLOGIES-PAT }}
 
       - name: Debug Config
         run: |
@@ -101,18 +101,18 @@ jobs:
               mkdir -p "temp_sync/$(dirname "$file")"
               gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$file" \
                 --header "Accept: application/vnd.github.raw" \
-                > "temp_sync/$file"
+                > "temp_sync/$file" || echo "Warning: Failed to download $file"
             fi
           done
           
-          # Compare directories and detect changes
-          changes_detected=false
+          # Initialize changes file
+          echo "false" > changes_detected.txt
           
           # Compare each synced directory
           echo "$SYNC_DIRS" | while read -r dir; do
             if [ ! -z "$dir" ]; then
               if [ ! -d "$dir" ] || [ -n "$(diff -r "temp_sync/$dir" "$dir" 2>/dev/null)" ]; then
-                changes_detected=true
+                echo "true" > changes_detected.txt
                 echo "Changes detected in directory: $dir"
               fi
             fi
@@ -120,16 +120,16 @@ jobs:
           
           # Compare each synced file
           echo "$SYNC_FILES" | while read -r file; do
-            if [ ! -z "$file" ]; then
+            if [ ! -z "$file" ] && [ -f "temp_sync/$file" ]; then
               if [ ! -f "$file" ] || ! cmp -s "temp_sync/$file" "$file"; then
-                changes_detected=true
+                echo "true" > changes_detected.txt
                 echo "Changes detected in file: $file"
               fi
             fi
           done
           
           # If changes detected, update files
-          if [ "$changes_detected" = true ]; then
+          if [ "$(cat changes_detected.txt)" = "true" ]; then
             # Update directories
             echo "$SYNC_DIRS" | while read -r dir; do
               if [ ! -z "$dir" ]; then
@@ -141,16 +141,18 @@ jobs:
             
             # Update individual files
             echo "$SYNC_FILES" | while read -r file; do
-              if [ ! -z "$file" ]; then
+              if [ ! -z "$file" ] && [ -f "temp_sync/$file" ]; then
                 mkdir -p "$(dirname "$file")"
                 cp "temp_sync/$file" "$file"
               fi
             done
             
             echo "has_changes=true" >> $GITHUB_ENV
+          else
+            echo "No changes detected"
           fi
           
-          rm -rf temp_sync
+          rm -rf temp_sync changes_detected.txt
 
       - name: Create Pull Request
         if: env.has_changes == 'true'
