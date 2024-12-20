@@ -1,58 +1,54 @@
-= IES [INSERT NAME] Ontology
+# IES [INSERT NAME] Ontology
 
-image::assets/images/ies-logo.png[]
+![IES Logo](assets/images/ies-logo.png)
 
-== Overview
+## Overview
 This repository contains the development artifacts for an IES ontology project. It follows the standard IES ontology development repository structure and incorporates shared IES tools and GitHub workflows.
 
-== Repository Structure
+## Repository Structure
 The repository follows the IES standardized structure for ontology development:
 
 * `.github/` - GitHub workflows and issue templates
 * `assets/` - Project assets like images and logos
 * `build/` - Build artifacts and outputs
 * `docs/` - Project documentation
-** `diagrams/` - Ontology diagrams and visualizations
-** `exemplars/` - Example usage and patterns
-** `specifications/` - Formal specifications
+  * `diagrams/` - Ontology diagrams and visualizations
+  * `exemplars/` - Example usage and patterns
+  * `specifications/` - Formal specifications
 * `imports/` - Imported ontologies and dependencies
 * `src/` - Source files
-** `competencies/` - Competency questions in SPARQL
-** `data/` - Source data files
-** `ontology/` - Ontology source files
+  * `competencies/` - Competency questions in SPARQL
+  * `data/` - Source data files
+  * `ontology/` - Ontology source files
 * `tests/` - Test suites
-** `integration/` - Integration tests
-** `unit/` - Unit tests
-** `validation/` - Validation tests and shapes
+  * `integration/` - Integration tests
+  * `unit/` - Unit tests
+  * `validation/` - Validation tests and shapes
 * `ies-tools/` - Development tools
 
-== Initial Setup
+## Initial Setup
 Follow these steps to set up a new ontology repository:
 
-1. Create a new (domain) ontology development repository from the IES Ontology template (link:https://github.com/Acme-Ontologies/ies-ontology-template/generate[IES Ontology Template]). See the link:.github/README.md[.gitHub README.md] for detailed information about available workflows and templates.
+1. Create a new (domain) ontology development repository from the IES Ontology template [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template/generate). See the [.gitHub README.md](.github/README.md) for detailed information about available workflows and templates.
 
 2. Set up poetry / Python environment for ies-tools:
-+
-[source,bash]
-----
-poetry install
-----
+   ```bash
+   poetry install
+   ```
+
 3. Verify poetry setup:
-+
-[source,bash]
-----
-poetry run gh-tool --help
-----
+   ```bash
+   poetry run gh-tool --help
+   ```
 
 If all is well, you should see the help output for the `gh-tool` command.
 
-== Development GitHub Workflows
+## Development GitHub Workflows
 
-=== Creating Issues
+### Creating Issues
 Use the provided tools to create standardized issues:
 
-[source,bash]
-----
+```bash
 # Create a feature request
 poetry run gh-tool create-feature
 
@@ -61,38 +57,36 @@ poetry run gh-tool create-bug
 
 # Create a documentation task
 poetry run gh-tool create-docs-task
-----
+```
 
-=== Pull Requests
+### Pull Requests
 Create pull requests using the provided tool:
 
-[source,bash]
-----
+```bash
 poetry run gh-tool create-pr
-----
+```
 
-=== Updating GitHub workflows and IES Tools
+### Updating GitHub workflows and IES Tools
 The special GitHub workflow `sync-tools.yml` is scheduled to run daily to update the common IES workflows and tools from the [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template).
 When updates are available, a PR will be created ready to be reviewed and merged into the local repository.
 
-Alterntively, the workflow can be triggered manually by running the following commands:
+Alternatively, the workflow can be triggered manually by running the following commands:
 
-[source,bash]
-----
+```bash
 # Fetch latest tool changes from the IES Ontology Template
 poetry run sync-tools
-----
+```
 
 If there are updates, review the new PR and merge it into the local repository.
 
-== Contributing
-Please see link:docs/CONTRIBUTING.adoc[Contributing Guide] for guidelines on how to contribute to this ontology project.
+## Contributing
+Please see [Contributing Guide](docs/CONTRIBUTING.adoc) for guidelines on how to contribute to this ontology project.
 
-== License
-This ontology repository is licensed under the MIT License. See link:LICENCE[LICENCE] for details.
+## License
+This ontology repository is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-== Changelog
-See link:CHANGELOG.adoc[CHANGELOG] for a list of changes in each release.
+## Changelog
+See [CHANGELOG](CHANGELOG.adoc) for a list of changes in each release.
 
-== Version
-Current version information is maintained in the link:VERSION[VERSION] file.
+## Version
+Current version information is maintained in the [VERSION](VERSION) file.
