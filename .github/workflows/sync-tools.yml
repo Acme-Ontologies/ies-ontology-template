@@ -53,44 +53,41 @@ jobs:
 
       - name: Sync Configuration
         run: |
+          # Function to recursively process directories
+          process_directory() {
+            local dir="$1"
+            echo "Processing directory: $dir"
+            
+            # Get contents of directory
+            gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$dir" \
+              --jq '.[] | {path: .path, type: .type, name: .name}' | while read -r item; do
+              item_path=$(echo "$item" | jq -r '.path')
+              item_type=$(echo "$item" | jq -r '.type')
+              item_name=$(echo "$item" | jq -r '.name')
+              
+              if [ "$item_type" = "file" ]; then
+                echo "Downloading file: $item_path"
+                mkdir -p "temp_sync/$(dirname "$item_path")"
+                gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$item_path" \
+                  --header "Accept: application/vnd.github.raw" \
+                  > "temp_sync/$item_path"
+              elif [ "$item_type" = "dir" ]; then
+                echo "Processing subdirectory: $item_path"
+                mkdir -p "temp_sync/$item_path"
+                # Recursively process subdirectory
+                process_directory "$item_path"
+              fi
+            done
+          }
+          
           # Create temp directory
           mkdir -p temp_sync
           
           # Process each directory to sync
           echo "$SYNC_DIRS" | while read -r dir; do
             if [ ! -z "$dir" ]; then
-              echo "Processing directory: $dir"
-              
-              # Create parent directories if needed
               mkdir -p "temp_sync/$(dirname "$dir")"
-              
-              # Get contents of directory recursively
-              gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$dir" \
-                --jq '.[] | {path: .path, type: .type}' | while read -r item; do
-                item_path=$(echo "$item" | jq -r '.path')
-                item_type=$(echo "$item" | jq -r '.type')
-                
-                if [ "$item_type" = "file" ]; then
-                  echo "Downloading file: $item_path"
-                  mkdir -p "temp_sync/$(dirname "$item_path")"
-                  gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$item_path" \
-                    --header "Accept: application/vnd.github.raw" \
-                    > "temp_sync/$item_path"
-                elif [ "$item_type" = "dir" ]; then
-                  echo "Creating directory: $item_path"
-                  mkdir -p "temp_sync/$item_path"
-                  
-                  # Get files in this directory
-                  gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$item_path" \
-                    --jq '.[].path' | while read -r file_path; do
-                    echo "Downloading: $file_path"
-                    mkdir -p "temp_sync/$(dirname "$file_path")"
-                    gh api "/repos/Acme-Ontologies/ies-ontology-template/contents/$file_path" \
-                      --header "Accept: application/vnd.github.raw" \
-                      > "temp_sync/$file_path"
-                  done
-                fi
-              done
+              process_directory "$dir"
             fi
           done
           
@@ -108,7 +105,7 @@ jobs:
           # Initialize changes file
           echo "false" > changes_detected.txt
           
-          # Compare each synced directory
+          # Compare directories recursively
           echo "$SYNC_DIRS" | while read -r dir; do
             if [ ! -z "$dir" ]; then
               if [ ! -d "$dir" ] || [ -n "$(diff -r "temp_sync/$dir" "$dir" 2>/dev/null)" ]; then
@@ -118,7 +115,7 @@ jobs:
             fi
           done
           
-          # Compare each synced file
+          # Compare individual files
           echo "$SYNC_FILES" | while read -r file; do
             if [ ! -z "$file" ] && [ -f "temp_sync/$file" ]; then
               if [ ! -f "$file" ] || ! cmp -s "temp_sync/$file" "$file"; then
