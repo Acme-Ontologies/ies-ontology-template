@@ -22,13 +22,13 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.ACME-ONTOLOGIES-PAT }}
+      GH_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
     steps:
       - name: Checkout consuming repository
         uses: actions/checkout@v4
         with:
           ref: main
-          token: ${{ secrets.ACME-ONTOLOGIES-PAT }}
+          token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
 
       - name: Debug Config
         run: |
