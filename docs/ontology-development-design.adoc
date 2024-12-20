@@ -7,10 +7,8 @@
 
 === ToDo
 
-  - [ ] Add details of how to set-up GitHub SSH Key for submodule access
-  - [ ] Correct READMEs to show correct use of `poetry run gh-tool` commands
   - [ ] Add DOCUMENT_ID and DOCUMENT_DRAFT_STATUS_ID to project secrets
-  - [ ] is it possible to either checkout a non-main branch for submodules or enforce some branch rules preventing editting `main` branch directly?
+  - [ ] Note to add the `ACME-ONTOLOGIES-PAT` token as a repo secret for each domain ontology repo
   - [ ] ...
 
 === Purpose and Scope

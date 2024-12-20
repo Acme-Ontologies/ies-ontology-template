@@ -12,7 +12,7 @@ env:
   SYNC_FILES: |
     justfile
     poetry.lock
-    project.toml
+    pyproject.toml
 
 permissions:
   contents: write

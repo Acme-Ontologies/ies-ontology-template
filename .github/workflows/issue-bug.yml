@@ -1,0 +1,57 @@
+# .github/workflows/issue-issue-bug.yml
+name: Bug Report Workflow
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, closed]
+    branches:
+      - main
+      - master
+
+jobs:
+  process_bug:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'bug') || contains(github.event.pull_request.head.ref, 'bugfix/')
+    steps:
+      - name: Process new bug report
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.IES_REPO_MGT_PAT }}
+          script: |
+            const issue = context.payload.issue;
+
+            // Add to project using GraphQL API
+            const addToProject = await github.graphql(`
+              mutation($projectId:ID!, $contentId:ID!) {
+                addProjectV2ItemById(input: {
+                  projectId: $projectId
+                  contentId: $contentId
+                }) {
+                  item {
+                    id
+                  }
+                }
+              }
+            `, {
+              projectId: process.env.PROJECT_ID,
+              contentId: issue.node_id
+            });
+
+      - name: Process bug fix PR
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['bug', 'wip']
+            });
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}

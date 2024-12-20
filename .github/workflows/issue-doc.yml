@@ -1,0 +1,109 @@
+# .github/workflows/issue-issue-doc.yml
+name: Documentation Workflow
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, closed]
+    branches:
+      - main
+      - master
+    paths:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  process_documentation:
+    runs-on: ubuntu-latest
+    steps:
+      # Handle new documentation issues
+      - name: Process new documentation issue
+        if: |
+          github.event_name == 'issues' &&
+          contains(github.event.issue.labels.*.name, 'documentation')
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.IES_REPO_MGT_PAT }}
+          script: |
+            // Debug logging
+            console.log('Starting documentation workflow...');
+
+            const issue = context.payload.issue;
+            console.log(`Processing issue #${issue.number}`);
+
+            // First, add to project
+            console.log('Adding to project...');
+            const addToProject = await github.graphql(`
+              mutation($projectId:ID!, $contentId:ID!) {
+                addProjectV2ItemById(input: {
+                  projectId: $projectId
+                  contentId: $contentId
+                }) {
+                  item {
+                    id
+                  }
+                }
+              }
+            `, {
+              projectId: process.env.PROJECT_ID,
+              contentId: issue.node_id
+            });
+
+            console.log('Added to project, getting item details...');
+
+            // Wait a moment for the item to be fully created
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Get all items in the project to find our issue
+            const { repository } = await github.graphql(`
+              query($owner:String!, $repo:String!, $number:Int!) {
+                repository(owner:$owner, name:$repo) {
+                  issue(number:$number) {
+                    projectItems(first:1) {
+                      nodes {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            `, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              number: issue.number
+            });
+
+            const itemId = repository.issue.projectItems.nodes[0].id;
+            console.log(`Found project item ID: ${itemId}`);
+
+            // Update the Documentation Status field
+            console.log('Updating Documentation Status...');
+            await github.graphql(`
+              mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $value:String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId
+                  itemId: $itemId
+                  fieldId: $fieldId
+                  value: {
+                    singleSelectOptionId: $value
+                  }
+                }) {
+                  projectV2Item {
+                    id
+                  }
+                }
+              }
+            `, {
+              projectId: process.env.PROJECT_ID,
+              itemId: itemId,
+              fieldId: process.env.DOC_STATUS_ID,
+              value: process.env.DOC_STATUS_DRAFT_OPTION_ID
+            });
+
+            console.log('Workflow completed successfully');
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  DOC_STATUS_ID: ${{ secrets.DOC_STATUS_ID }}
+  DOC_STATUS_DRAFT_OPTION_ID: ${{ secrets.DOC_STATUS_DRAFT_OPTION_ID }}
