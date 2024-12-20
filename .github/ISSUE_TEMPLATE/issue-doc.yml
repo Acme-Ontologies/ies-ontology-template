@@ -1,0 +1,42 @@
+name: IES Application Ontology Documentation
+description: Create an IES Application Ontology documentation task
+title: "[DOCS] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Documentation Task"
+  - type: textarea
+    id: description
+    attributes:
+      label: What needs to be documented?
+      description: Describe what documentation needs to be added or updated
+    validations:
+      required: true
+  - type: input
+    id: files
+    attributes:
+      label: Files to Update
+      description: Which files need to be updated? (comma-separated)
+      placeholder: "README.md, docs/setup.md"
+    validations:
+      required: true
+  - type: checkboxes
+    id: type
+    attributes:
+      label: Type of Documentation
+      options:
+        - label: New documentation
+        - label: Update existing documentation
+        - label: Fix errors/typos
+        - label: Improve clarity
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true

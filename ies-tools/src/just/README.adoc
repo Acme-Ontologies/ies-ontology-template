@@ -1,0 +1,31 @@
+= Just Recipes for IES Projects
+
+This directory contains shared https://just.systems/[just] command runner recipes used across IES projects.
+
+== Files
+
+`common.just`:: Common recipes shared across all IES projects
+
+== Usage
+
+To use these recipes in your project, add an import line to your project's `justfile`:
+
+[source]
+----
+import 'tools/ies-tools/just/common.just'
+----
+
+This will make all recipes from `common.just` available in your project.
+
+You can override any imported recipe by defining it locally in your project's `justfile`, and add additional project-specific recipes as needed.
+
+== Adding New Recipes
+
+When adding new recipes to `common.just`:
+
+1. Ensure the recipe is truly common across projects
+2. Add clear comments explaining the recipe's purpose
+3. Use variables where values might need to be customized
+4. Test the recipe in at least one consuming project before committing
+
+See the just command runner https://just.systems/man/en/[manual] for detailed documentation on writing recipes.

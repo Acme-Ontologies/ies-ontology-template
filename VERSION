@@ -5,29 +5,27 @@
 # updated with the actual version information #
 ###############################################
 
-VERSION=1.2.3
-LAST_UPDATED=2024-03-10
-STATUS=stable
+VERSION=0.1.0
+LAST_UPDATED=2024-12-29
+STATUS=development
 
 # Version number explanation:
 # MAJOR version (1) - Incompatible changes (removing terms, changing IRIs)
 # MINOR version (2) - Backwards-compatible additions (new terms, properties)
 # PATCH version (3) - Backwards-compatible fixes (labels, annotations, documentation)
 
-# Release Notes for 1.2.3
-- Fixed labels in Person class annotations
-- Added missing rdfs:comments to Organization properties
-- Updated documentation for Project relationships
+# Release Notes for 0.1.0
+- E.g. Added missing rdfs:comments to Organization properties
+- E.g. Updated documentation for Project relationships
 
 # Previous Versions
-1.2.2 - 2024-02-15 - Documentation updates
-1.2.1 - 2024-01-20 - Label corrections
-1.2.0 - 2024-01-10 - Added new Organization properties
-1.1.0 - 2023-12-15 - Added Project class hierarchy
-1.0.0 - 2023-11-01 - Initial stable release
+# E.g. 0.1.0 - 2024-12-29 - Initial development version
 
 # Status Types
 # - experimental: Early development, expect breaking changes
+# - development: Active development, expect changes
 # - testing: Feature complete but under testing
+# - qa-review: Ready for internal QA review
+# - release candidate: Ready for production testing
 # - stable: Production ready
 # - deprecated: Will be removed in future versions

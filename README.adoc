@@ -8,7 +8,7 @@ This repository contains the development artifacts for an IES ontology project. 
 == Repository Structure
 The repository follows the IES standardized structure for ontology development:
 
-* `.github/` - GitHub workflows and issue templates (added via submodule)
+* `.github/` - GitHub workflows and issue templates
 * `assets/` - Project assets like images and logos
 * `build/` - Build artifacts and outputs
 * `docs/` - Project documentation
@@ -24,42 +24,29 @@ The repository follows the IES standardized structure for ontology development:
 ** `integration/` - Integration tests
 ** `unit/` - Unit tests
 ** `validation/` - Validation tests and shapes
-* `tools/` - Development tools (added via submodule)
+* `ies-tools/` - Development tools
 
 == Initial Setup
 Follow these steps to set up a new ontology repository:
 
-1. Create a new repository from the IES Ontology template (link:https://github.com/aigora-de/ies-ontology-template[IES Ontology Template]).
-2. Add required submodules for IES GitHub config and tools:
+1. Create a new (domain) ontology development repository from the IES Ontology template (link:https://github.com/Acme-Ontologies/ies-ontology-template/generate[IES Ontology Template]). See the link:.github/README.md[.gitHub README.md] for detailed information about available workflows and templates.
+
+2. Set up poetry / Python environment for ies-tools:
 +
 [source,bash]
 ----
-# Add IES GitHub configuration (workflows and templates)
-git submodule add git@github.com:aigora-de/ies-github-config.git .github
-
-# Add IES ontology development tools
-git submodule add git@github.com:aigora-de/ies-tools.git tools/ies-tools
-
-# Initialize submodules
-git submodule update --init
-----
-
-3. Set up Python environment for tools:
-+
-[source,bash]
-----
-cd tools/ies-tools
 poetry install
 ----
-
-4. Verify setup:
+3. Verify poetry setup:
 +
 [source,bash]
 ----
 poetry run gh-tool --help
 ----
 
-== Development Workflow
+If all is well, you should see the help output for the `gh-tool` command.
+
+== Development GitHub Workflows
 
 === Creating Issues
 Use the provided tools to create standardized issues:
@@ -84,56 +71,25 @@ Create pull requests using the provided tool:
 poetry run gh-tool create-pr
 ----
 
-=== Updating Tools
-When updates are available in the submodule repositories:
+=== Updating GitHub workflows and IES Tools
+The special GitHub workflow `sync-tools.yml` is scheduled to run daily to update the common IES workflows and tools from the [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template).
+When updates are available, a PR will be created ready to be reviewed and merged into the local repository.
+
+Alterntively, the workflow can be triggered manually by running the following commands:
 
 [source,bash]
 ----
-# Update submodules to latest version
-git submodule update --remote
-git commit -am "Update GitHub config and tools"
-git push
+# Fetch latest tool changes from the IES Ontology Template
+poetry run sync-tools
 ----
 
-== For New Team Members
-
-=== Initial Clone
-When cloning this repository for the first time:
-
-[source,bash]
-----
-# Clone with submodules
-git clone --recurse-submodules <repo-url>
-
-# Or after a regular clone
-git clone <repo-url>
-git submodule update --init
-----
-
-=== Tool Setup
-Set up the development tools:
-
-[source,bash]
-----
-cd tools/ies-tools
-poetry install
-----
-
-== GitHub Workflows
-The following workflows are available through the `.github` submodule:
-
-* Feature Request Workflow - Handles creation and tracking of feature requests
-* Bug Report Workflow - Manages bug reports and fixes
-* Documentation Workflow - Coordinates documentation tasks
-* Pull Request Workflow - Automates PR reviews and merges
-
-See the link:.github/README.adoc[GitHub Configuration README] for detailed information about available workflows and templates.
+If there are updates, review the new PR and merge it into the local repository.
 
 == Contributing
 Please see link:docs/CONTRIBUTING.adoc[Contributing Guide] for guidelines on how to contribute to this ontology project.
 
 == License
-This ontology repository is licensed under the MIT License. See link:LICENSE[LICENSE] for details.
+This ontology repository is licensed under the MIT License. See link:LICENCE[LICENCE] for details.
 
 == Changelog
 See link:CHANGELOG.adoc[CHANGELOG] for a list of changes in each release.
