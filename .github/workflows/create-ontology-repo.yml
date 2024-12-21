@@ -91,14 +91,31 @@ jobs:
 
             // Store PROJECT_ID as a repository variable
             try {
-              await github.rest.actions.createOrUpdateRepoVariable({
-                owner: context.repo.owner,
-                repo: context.payload.inputs.repo_name,
+              const createVarQuery = `
+                mutation ($repositoryId: ID!, $name: String!, $value: String!) {
+                  createRepositoryVariable(
+                    input: {
+                      repositoryId: $repositoryId
+                      name: $name
+                      value: $value
+                    }
+                  ) {
+                    variable {
+                      name
+                    }
+                  }
+                }
+              `;
+              
+              await github.graphql(createVarQuery, {
+                repositoryId: repo.data.node_id,
                 name: 'PROJECT_ID',
                 value: projectId
               });
               console.log('Successfully stored PROJECT_ID as a repository variable');
             } catch (error) {
               console.error('Failed to store PROJECT_ID as a variable:', error);
+              // Store the project ID in the workflow output for reference
+              console.log('Project ID for manual configuration:', projectId);
               // Continue execution as this is not critical
             }
