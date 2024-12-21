@@ -80,13 +80,13 @@ poetry run sync-tools
 If there are updates, review the new PR and merge it into the local repository.
 
 ## Contributing
-Please see [Contributing Guide](docs/CONTRIBUTING.adoc) for guidelines on how to contribute to this ontology project.
+Please see [Contributing Guide](docs/CONTRIBUTING) for guidelines on how to contribute to this ontology project.
 
 ## License
 This ontology repository is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## Changelog
-See [CHANGELOG](CHANGELOG.adoc) for a list of changes in each release.
+See [CHANGELOG](CHANGELOG) for a list of changes in each release.
 
 ## Version
 Current version information is maintained in the [VERSION](VERSION) file.

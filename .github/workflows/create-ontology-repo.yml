@@ -1,0 +1,110 @@
+name: Create Repository from Template
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        description: 'Repository name'
+        required: true
+        type: string
+      repo_description:
+        description: 'Repository description'
+        required: true
+        type: string
+      is_public:
+        description: 'Public repository?'
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  create_repository:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Install libsodium
+        run: npm install libsodium-wrappers
+
+      - name: Create repository and configure
+        uses: actions/github-script@v6
+        env:
+          GH_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
+        with:
+          github-token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
+          script: |
+            const sodium = require('libsodium-wrappers');
+            await sodium.ready;
+            
+            // Create repository from ies-ontology-template
+            const repo = await github.rest.repos.createUsingTemplate({
+              template_owner: context.repo.owner,
+              template_repo: 'ies-ontology-template',
+              owner: context.repo.owner,
+              name: context.payload.inputs.repo_name,
+              description: context.payload.inputs.repo_description,
+              include_all_branches: true,
+              private: !context.payload.inputs.is_public
+            });
+
+            // Get organization ID
+            const orgQuery = `
+              query {
+                organization(login: "${context.repo.owner}") {
+                  id
+                }
+              }
+            `;
+            const orgResponse = await github.graphql(orgQuery);
+            const orgId = orgResponse.organization.id;
+
+            // Create ProjectV2
+            const projectQuery = `
+              mutation {
+                createProjectV2(
+                  input: {
+                    ownerId: "${orgId}",
+                    title: "${context.payload.inputs.repo_name} Development"
+                  }
+                ) {
+                  projectV2 {
+                    id
+                  }
+                }
+              }
+            `;
+            const projectResponse = await github.graphql(projectQuery);
+            const projectId = projectResponse.createProjectV2.projectV2.id;
+
+            // Link project to repository
+            const linkQuery = `
+              mutation {
+                linkProjectV2ToRepository(
+                  input: {
+                    projectId: "${projectId}",
+                    repositoryId: "${repo.data.node_id}"
+                  }
+                ) {
+                  repository {
+                    id
+                  }
+                }
+              }
+            `;
+            await github.graphql(linkQuery);
+
+            // Get repo public key for secrets
+            const keyResponse = await github.rest.actions.getRepoPublicKey({
+              owner: context.repo.owner,
+              repo: context.payload.inputs.repo_name
+            });
+
+            // Store PROJECT_ID as a repository variable
+            await github.rest.actions.createOrUpdateRepoVariable({
+              owner: context.repo.owner,
+              repo: context.payload.inputs.repo_name,
+              name: 'PROJECT_ID',
+              value: projectId
+            });

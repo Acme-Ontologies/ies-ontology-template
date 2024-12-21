@@ -9,7 +9,17 @@
 
   - [ ] Add DOCUMENT_ID and DOCUMENT_DRAFT_STATUS_ID to project secrets
   - [ ] Note to add the `ACME-ONTOLOGIES-PAT` token as a repo secret for each domain ontology repo
-  - [ ] ...
+  - [ ] Add ies-core as submodule to all domain ontologies; can it be done automatically? Or using a one-off workflow or just script (yes, use a just script to add the submodule)
+  - [ ] Make issue-feature work in a domain ontology repo
+  - [ ] Make issue-bug work in a domain ontology repo
+  - [ ] Make issue-doc work in a domain ontology repo
+  - [ ] Make ontology-qa-review work in a domain ontology repo
+  - [ ] Make ontology-release-candidate work in a domain ontology repo
+  - [ ] Make ontology-validation work in a domain ontology repo
+  - [ ] Add a CONTRIBUTING.md file to the domain ontology repo
+  - [ ] Create the CHANGELOG.md file, as example
+
+  - [ ] Add Crown copyright notice to the LICENSE file
 
 === Purpose and Scope
 This ontology aims to provide a standardized vocabulary for the domain. It covers key concepts and relationships.
