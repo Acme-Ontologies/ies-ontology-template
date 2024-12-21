@@ -5,21 +5,29 @@ This ontology template repository includes definitions for common GitHub workflo
 ## Contents
 ```ascii
 .
-├── .github
-│   ├── CODEOWNERS
-│   ├── ISSUE_TEMPLATE
-│   │   ├── issue-bug.yml
-│   │   ├── issue-doc.yml
-│   │   └── issue-feature.yml
-│   └── workflows
-│       ├── README_update_workflows.md
-│       ├── issue-bug.yml
-│       ├── issue-doc.yml
-│       ├── issue-feature.yml
-│       ├── ontology-qa-review.yml
-│       ├── ontology-release-candidate.yml
-│       └── ontology-validation.yml
-└── README.md
+├── CODEOWNERS
+├── ISSUE_TEMPLATE
+│   ├── feature-request.yml
+│   ├── issue-bug.yml
+│   └── issue-doc.yml
+├── README.md
+├── sstructure.txt
+└── workflows
+    ├── README-create-ontology-repo.md
+    ├── README-feature-workflows.md
+    ├── README-sync-ies-tools.md
+    ├── create-ontology-repo.yml
+    ├── feature-development.yml
+    ├── feature-request.yml
+    ├── issue-bug.yml
+    ├── issue-doc.yml
+    ├── ontology-qa-review.yml
+    ├── ontology-release-candidate.yml
+    ├── ontology-validation.yml
+    ├── setup-labels.yml
+    └── sync-ies-tools.yml
+
+3 directories, 19 files
 ```
 
 ## Usage
