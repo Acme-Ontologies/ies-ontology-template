@@ -25,9 +25,6 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Install libsodium
-        run: npm install libsodium-wrappers
-
       - name: Create repository and configure
         uses: actions/github-script@v6
         env:
@@ -35,9 +32,6 @@ jobs:
         with:
           github-token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
           script: |
-            const sodium = require('libsodium-wrappers');
-            await sodium.ready;
-            
             // Create repository from ies-ontology-template
             const repo = await github.rest.repos.createUsingTemplate({
               template_owner: context.repo.owner,
@@ -95,16 +89,16 @@ jobs:
             `;
             await github.graphql(linkQuery);
 
-            // Get repo public key for secrets
-            const keyResponse = await github.rest.actions.getRepoPublicKey({
-              owner: context.repo.owner,
-              repo: context.payload.inputs.repo_name
-            });
-
             // Store PROJECT_ID as a repository variable
-            await github.rest.actions.createOrUpdateRepoVariable({
-              owner: context.repo.owner,
-              repo: context.payload.inputs.repo_name,
-              name: 'PROJECT_ID',
-              value: projectId
-            });
+            try {
+              await github.rest.actions.createOrUpdateRepoVariable({
+                owner: context.repo.owner,
+                repo: context.payload.inputs.repo_name,
+                name: 'PROJECT_ID',
+                value: projectId
+              });
+              console.log('Successfully stored PROJECT_ID as a repository variable');
+            } catch (error) {
+              console.error('Failed to store PROJECT_ID as a variable:', error);
+              // Continue execution as this is not critical
+            }
