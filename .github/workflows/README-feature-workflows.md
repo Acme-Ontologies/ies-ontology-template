@@ -26,8 +26,19 @@ The workflows support the following branch structure:
 
 A manually triggered workflow for creating new feature requests.
 
-**Usage:**
-1. Go to Actions tab
+**Local repo usage:**
+```bash
+gh workflow run feature-request.yml
+git fetch origin
+git branch
+```
+Switch to the feature branch:
+```bash
+git switch feature/[feature-name]
+```
+
+**GitHub Web Usage:**
+1. Go to GitHub.com Actions tab
 2. Select "Create Feature Issue"
 3. Click "Run workflow"
 4. Fill out the form:

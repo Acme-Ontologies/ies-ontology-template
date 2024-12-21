@@ -1,4 +1,4 @@
-name: Create Feature Issue
+name: Create Feature Request
 
 on:
   workflow_dispatch:
@@ -51,18 +51,30 @@ on:
         type: string
 
 permissions:
+  contents: write
   issues: write
 
 jobs:
-  create_issue:
+  create_feature:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PROJECT_ID: ${{ vars.PROJECT_ID }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+
       - name: Create feature issue
+        id: create_issue
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const title = `[Feature]: ${context.payload.inputs.title}`;
+            // Create issue title with [Feature] prefix
+            const title = `[Feature] ${context.payload.inputs.title}`;
             
             // Format the issue body using the template structure
             const body = `
@@ -86,7 +98,8 @@ jobs:
             `;
             
             try {
-              const response = await github.rest.issues.create({
+              // Create the issue
+              const issue = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: title,
@@ -94,9 +107,86 @@ jobs:
                 labels: ['enhancement']
               });
               
-              console.log(`Created issue #${response.data.number}`);
+              console.log(`Created issue #${issue.data.number}`);
+              
+              // Return issue number for other steps
+              return { issueNumber: issue.data.number };
               
             } catch (error) {
               console.error('Error creating issue:', error);
               core.setFailed(error.message);
             }
+
+      - name: Add issue to project
+        env:
+          ISSUE_ID: ${{ fromJSON(steps.create_issue.outputs.result).issueNumber }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              // Get issue node ID using GraphQL
+              const getIssueId = await github.graphql(`
+                query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    issue(number: $number) {
+                      id
+                    }
+                  }
+                }
+              `, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                number: parseInt(process.env.ISSUE_ID)
+              });
+              
+              const issueId = getIssueId.repository.issue.id;
+              
+              // Add to project using GraphQL
+              await github.graphql(`
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {
+                    projectId: $projectId
+                    contentId: $contentId
+                  }) {
+                    item {
+                      id
+                    }
+                  }
+                }
+              `, {
+                projectId: process.env.PROJECT_ID,
+                contentId: issueId
+              });
+              
+              console.log(`Added issue #${process.env.ISSUE_ID} to project ${process.env.PROJECT_ID}`);
+              
+            } catch (error) {
+              console.error('Error adding issue to project:', error);
+              core.setFailed(error.message);
+            }
+
+      - name: Create feature branch
+        env:
+          ISSUE_NUMBER: ${{ fromJSON(steps.create_issue.outputs.result).issueNumber }}
+        run: |
+          # Create sanitized branch name from issue title
+          BRANCH_NAME="feature/$(echo "${{ inputs.title }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9]/-/g')-$ISSUE_NUMBER"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Create new branch from develop
+          git checkout -b "$BRANCH_NAME"
+          
+          # Create initial commit with issue reference
+          echo "# Feature Implementation" > feature-implementation.md
+          echo "" >> feature-implementation.md
+          echo "Implements #$ISSUE_NUMBER" >> feature-implementation.md
+          
+          git add feature-implementation.md
+          git commit -m "feat: initial commit for #$ISSUE_NUMBER"
+          git push origin "$BRANCH_NAME"
+          
+          echo "Created branch $BRANCH_NAME"

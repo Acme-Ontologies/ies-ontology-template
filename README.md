@@ -38,22 +38,41 @@ See the [.gitHub README.md](.github/README.md) for detailed information about av
 
 After creating a new repository from the template, follow these steps to complete set up:
 
-1. Set up poetry / Python environment for ies-tools:
+1. Create the `development` branch from `main`. `feature/*` branches should be created from `development`.
++
+```bash
+git branch development
+```
+
+2. Set up poetry / Python environment for ies-tools:
 +
 ```bash
 poetry install
 ```
-2. Verify poetry setup:
+3. Verify poetry setup:
 +
 ```bash
 poetry run gh-tools --help
 ```
 If all is well, you should see the help output for the `gh-tools` command, including several available workflows.
 
-3. Manually run  `.github/workflows/setup-labels.yml` to ensure all project labels are initialised.
+4. Install GitHub CLI, `gh`
 +
 ```bash
-poetry run workflows setup-labels
+# On macOS
+brew install gh
+
+# On Ubuntu
+sudo apt-get install gh
+
+# On Windows
+TBD
+```
+
+5. Manually run  `.github/workflows/setup-labels.yml` to ensure all project labels are initialised.
++
+```bash
+gh workflow setup-labels.yml
 ```
 
 ## Development GitHub Workflows
