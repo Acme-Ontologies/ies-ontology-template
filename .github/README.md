@@ -34,19 +34,21 @@ The GitHub workflows and IES tools can be used as they would be in any other rep
 
 ## Contents
 ### Workflows
-  - sync-tools.yml - Syncs workflows and IES tools from the [ies-ontology-template](https://github.com/Acme-Ontologies/ies-ontology-template) repository to the domain ontology repository
-  - create-ontology-repo.yml - Workflow to create a new ontology repository from this template
-  - issue-feature.yml - Handles feature request automation
-  - issue-bug.yml - Handles bug report automation
-  - issue-doc.yml - Handles documentation task automation
-  - ontology-qa-review.yml - Workflow for ontology QA review
-  - ontology-release-candidate.yml - Workflow for ontology release candidates
-  - ontology-validation.yml - Workflow for ontology validation
+  - `sync-ies-tools.yml` - Syncs workflows and IES tools from the [ies-ontology-template](https://github.com/Acme-Ontologies/ies-ontology-template) repository to the domain ontology repository
+  - `setup-labels.yml` - Sets up standard repository labels for issue tracking
+  - `create-ontology-repo.yml` - Workflow to create a new ontology repository from this template
+  - `feature-request.yml` - Handles opening a new feature issue
+  - `feature-development.yml` - Automated workflow for feature development
+  - `issue-bug.yml` - Handles bug report automation
+  - `issue-doc.yml` - Handles documentation task automation
+  - `ontology-qa-review.yml` - Workflow for ontology QA review
+  - `ontology-release-candidate.yml` - Workflow for ontology release candidates
+  - `ontology-validation.yml` - Workflow for ontology validation
 
 ### Issue Templates
-  - issue-feature.yml - GitHub workflow Template for new feature requests
-  - issue-bug.yml - Template for bug reports
-  - issue-doc.yml - Template for documentation tasks
+  - `feature-request.yml` - GitHub workflow to open a new feature issue
+  - `issue-bug.yml` - GitHub workflow to open a new bug issue
+  - `issue-doc.yml` - GitHub workflow to open a new documentation issue
 
 ## Contributing
 When making changes to workflows or templates:
