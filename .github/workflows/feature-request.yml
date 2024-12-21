@@ -1,0 +1,102 @@
+name: Create Feature Issue
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Feature title'
+        required: true
+        type: string
+      problem:
+        description: 'Problem statement'
+        required: true
+        type: string
+      solution:
+        description: 'Proposed solution'
+        required: true
+        type: string
+      priority:
+        description: 'Priority level'
+        required: true
+        type: choice
+        options:
+          - priority:low
+          - priority:medium
+          - priority:high
+      size:
+        description: 'Estimated size'
+        required: true
+        type: choice
+        options:
+          - size:xs
+          - size:s
+          - size:m
+          - size:l
+          - size:xl
+      type:
+        description: 'Type of change (comma-separated if multiple)'
+        required: true
+        type: choice
+        options:
+          - Core Functionality
+          - Documentation
+          - Tests
+          - Performance
+          - User Interface
+          - Build System
+          - Dependencies
+      acceptance:
+        description: 'Acceptance criteria (bullet points)'
+        required: true
+        type: string
+
+permissions:
+  issues: write
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create feature issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = `[Feature]: ${context.payload.inputs.title}`;
+            
+            // Format the issue body using the template structure
+            const body = `
+            ## Problem Statement
+            ${context.payload.inputs.problem}
+
+            ## Proposed Solution
+            ${context.payload.inputs.solution}
+
+            ## Priority
+            ${context.payload.inputs.priority}
+
+            ## Size
+            ${context.payload.inputs.size}
+
+            ## Type of Change
+            ${context.payload.inputs.type}
+
+            ## Acceptance Criteria
+            ${context.payload.inputs.acceptance}
+            `;
+            
+            try {
+              const response = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['enhancement']
+              });
+              
+              console.log(`Created issue #${response.data.number}`);
+              
+            } catch (error) {
+              console.error('Error creating issue:', error);
+              core.setFailed(error.message);
+            }

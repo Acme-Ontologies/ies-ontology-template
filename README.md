@@ -36,21 +36,25 @@ The repository follows the IES standardized structure for ontology development:
 ## Initial Setup
 See the [.gitHub README.md](.github/README.md) for detailed information about available workflows and templates.
 
-Follow these steps to set up a new ontology repository:
+After creating a new repository from the template, follow these steps to complete set up:
 
-1. Create a new (domain) ontology development repository from the IES Ontology template [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template/generate), or better still use the `create-ontology-repo.yml` workflow.
-
-2. Set up poetry / Python environment for ies-tools:
-   ```bash
-   poetry install
-   ```
-
-3. Verify poetry setup:
-   ```bash
-   poetry run gh-tools --help
-   ```
-
+1. Set up poetry / Python environment for ies-tools:
++
+```bash
+poetry install
+```
+2. Verify poetry setup:
++
+```bash
+poetry run gh-tools --help
+```
 If all is well, you should see the help output for the `gh-tools` command, including several available workflows.
+
+3. Manually run  `.github/workflows/setup-labels.yml` to ensure all project labels are initialised.
++
+```bash
+poetry run workflows setup-labels
+```
 
 ## Development GitHub Workflows
 
