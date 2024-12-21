@@ -26,14 +26,13 @@ jobs:
 
     steps:
       - name: Create repository and configure
+        id: repo-setup
         uses: actions/github-script@v6
         env:
           GH_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
         with:
           github-token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
           script: |
-            const exec = require('@actions/exec');
-            
             // Create repository from ies-ontology-template
             const repo = await github.rest.repos.createUsingTemplate({
               template_owner: context.repo.owner,
@@ -91,20 +90,11 @@ jobs:
             `;
             await github.graphql(linkQuery);
 
-            // Store PROJECT_ID as a repository variable
-            try {
-              // Use gh CLI to create repository variable
-              const createVarCommand = `
-                gh api --method POST /repos/${context.repo.owner}/${context.payload.inputs.repo_name}/actions/variables \
-                  -f name='PROJECT_ID' \
-                  -f value='${projectId}'
-              `;
-              
-              await exec.exec('bash', ['-c', createVarCommand]);
-              console.log('Successfully stored PROJECT_ID as a repository variable');
-            } catch (error) {
-              console.error('Failed to store PROJECT_ID as a variable:', error);
-              // Store the project ID in the workflow output for reference
-              console.log('Project ID for manual configuration:', projectId);
-              // Continue execution as this is not critical
-            }
+            // Set output for next steps
+            core.setOutput('project-id', projectId);
+
+      - name: Create PROJECT_ID Variable
+        run: |
+          gh api --method POST /repos/${{ github.repository_owner }}/${{ github.event.inputs.repo_name }}/actions/variables \
+            -f name='PROJECT_ID' \
+            -f value='${{ steps.repo-setup.outputs.project-id }}'
