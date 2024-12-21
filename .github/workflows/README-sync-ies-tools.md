@@ -1,6 +1,6 @@
-# GitHub Configuration Sync Workflow
+# IES Sync Tools Workflow
 
-This workflow automatically synchronizes GitHub configuration files (everything in `.github/` directory) from a central configuration repository to consuming repositories.
+This workflow automatically synchronizes GitHub workflows and IES tools from the template `ies-ontology-template` repository.
 
 ## Overview
 
@@ -12,7 +12,7 @@ The workflow:
 
 ## Prerequisites
 
-1. Central config repository (`ies-github-workflows`) containing the master `.github/` configuration
+1. IES Ontology Template repository (`ies-ontology-template`) containing the master `.github/` configuration
 2. Personal Access Token (PAT) with:
    - `contents:write`
    - `workflows:write`
@@ -20,38 +20,30 @@ The workflow:
 
 ## Setup
 
-1. Create a PAT:
-   - Go to your GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens
+1. Create an Organization PAT:
+   - Go to your GitHub Organization Settings → Personal access tokens → Settings → Fine-grained tokens
    - Create new token with:
      * Repository access: Selected repositories (`ies-github-workflows` and consuming repos)
      * Repository permissions:
        - Contents: Write
        - Workflows: Write
 
-2. Add the PAT as a repository secret:
-   - Go to consuming repository Settings → Secrets and variables → Actions
-   - Create new repository secret:
-     * Name: `WORKFLOW_SYNC_TOKEN`
-     * Value: Your PAT
+2. There's no need to add the Organization PAT as it is visible to all repositories in the Organization.
 
-3. Add the workflow file:
-   - Create `.github/workflows/sync-config.yaml` in your consuming repository
-   - Copy the workflow code
+3. The `sync-tools.yml` workflow is scheduled to execute daily in any repository created from `ies-ontology-template`, or it can be run manually.
 
 ## How It Works
 
-1. Checks central repository for `.github/` contents
-2. Downloads all files and directories
-3. Compares with local `.github/` directory
-4. If changes detected:
+1. Checks `ies-ontology-template` repository for contents as specified in the `sync-config.yml` file.
+2. Downloads all files and directories to compare with the content in the domain ontology repository.
+4. If changes are detected, it:
    - Creates new branch
-   - Updates files (preserving sync workflow)
-   - Creates PR with detailed changes
-   - PR requires review and approval
+   - Updates files in the domain ontology repository
+   - Creates a PR with detailed changes
+   - PR requires review and approval before merging changes into `main`
 
 ## Special Handling
 
-- The `sync-config.yaml` workflow file is preserved during sync
 - Changes to workflow files require special permissions (hence the PAT requirement)
 - The sync process is atomic - all changes are made in a single PR
 
@@ -69,7 +61,7 @@ Check the workflow run logs for detailed information about each step.
 
 To manually trigger the sync:
 1. Go to the Actions tab in your repository
-2. Select "Sync GitHub Configuration"
+2. Select "Sync IES Tools"
 3. Click "Run workflow"
 4. Select branch (usually 'main')
 5. Click "Run workflow"
@@ -78,13 +70,13 @@ To manually trigger the sync:
 
 1. Permission errors:
    - Verify PAT has correct permissions
-   - Ensure PAT is added as `WORKFLOW_SYNC_TOKEN`
+   - Ensure PAT is added as `ACME_ONTOLOGIES_PAT`
    - Check PAT hasn't expired
 
 2. 404 errors:
    - Verify repository paths
    - Check repository access permissions
-   - Ensure `.github` directory exists in central repo
+   - Ensure specified content (e.g. `.github/`, `ies-tools/`) exists in `ies-ontology-template` repository.
 
 3. Push/PR failures:
    - Ensure branch protection rules allow GitHub Actions

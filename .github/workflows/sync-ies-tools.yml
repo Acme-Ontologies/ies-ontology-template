@@ -1,4 +1,4 @@
-name: Sync Configuration
+name: Sync IES Tools
 
 on:
   schedule:

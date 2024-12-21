@@ -2,6 +2,13 @@
 
 ![IES Logo](assets/images/ies-logo.png)
 
+## Update This README
+Modify this README to reflect the domain ontology project. As a minimum:
+
+  - Replace `[INSERT NAME]` with the name of the ontology project
+  - Update the `Overview` section with a brief description of the ontology project
+  - (Optional) update the `Repository Structure` section with the structure of the ontology project
+
 ## Overview
 This repository contains the development artifacts for an IES ontology project. It follows the standard IES ontology development repository structure and incorporates shared IES tools and GitHub workflows.
 
@@ -27,9 +34,11 @@ The repository follows the IES standardized structure for ontology development:
 * `ies-tools/` - Development tools
 
 ## Initial Setup
+See the [.gitHub README.md](.github/README.md) for detailed information about available workflows and templates.
+
 Follow these steps to set up a new ontology repository:
 
-1. Create a new (domain) ontology development repository from the IES Ontology template [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template/generate). See the [.gitHub README.md](.github/README.md) for detailed information about available workflows and templates.
+1. Create a new (domain) ontology development repository from the IES Ontology template [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template/generate), or better still use the `create-ontology-repo.yml` workflow.
 
 2. Set up poetry / Python environment for ies-tools:
    ```bash
@@ -38,10 +47,10 @@ Follow these steps to set up a new ontology repository:
 
 3. Verify poetry setup:
    ```bash
-   poetry run gh-tool --help
+   poetry run gh-tools --help
    ```
 
-If all is well, you should see the help output for the `gh-tool` command.
+If all is well, you should see the help output for the `gh-tools` command, including several available workflows.
 
 ## Development GitHub Workflows
 

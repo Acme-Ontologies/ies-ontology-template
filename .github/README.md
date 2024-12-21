@@ -24,7 +24,7 @@ This ontology template repository includes definitions for common GitHub workflo
 
 ## Usage
 
-This template repository is used to create a new (domain) ontology repository on GitHub.com for development. [Use this template](https://github.com/Acme-Ontologies/ies-ontology-template/generate) page to create a new repository.
+This template repository is used to create a new (domain) ontology repository on GitHub.com for development. [Use this template](https://github.com/Acme-Ontologies/ies-ontology-template/generate) page to create a new repository, or run the `create-ontology-repo.yml` workflow.
 
 This will create a new ontology development repository with the workflows and issue templates from this template repository.
 
@@ -35,6 +35,7 @@ The GitHub workflows and IES tools can be used as they would be in any other rep
 ## Contents
 ### Workflows
   - sync-tools.yml - Syncs workflows and IES tools from the [ies-ontology-template](https://github.com/Acme-Ontologies/ies-ontology-template) repository to the domain ontology repository
+  - create-ontology-repo.yml - Workflow to create a new ontology repository from this template
   - issue-feature.yml - Handles feature request automation
   - issue-bug.yml - Handles bug report automation
   - issue-doc.yml - Handles documentation task automation

@@ -90,6 +90,46 @@ jobs:
             `;
             await github.graphql(linkQuery);
 
+            // Create labels
+            const labels = [
+              { name: 'bug', color: 'd73a4a', description: "Something isn't working" },
+              { name: 'documentation', color: '0075ca', description: 'General documentation tasks' },
+              { name: 'duplicate', color: 'cfd3d7', description: 'This issue or pull request already exists' },
+              { name: 'enhancement', color: 'a2eeef', description: 'New feature or request' },
+              { name: 'good first issue', color: '7057ff', description: 'Good for newcomers' },
+              { name: 'help wanted', color: '008672', description: 'Extra attention is needed' },
+              { name: 'invalid', color: 'e4e669', description: "This doesn't seem right" },
+              { name: 'question', color: 'd876e3', description: 'Further information is requested' },
+              { name: 'wontfix', color: 'ffffff', description: 'This will not be worked on' },
+              { name: 'priority-high', color: 'b60205', description: 'Urgent issues' },
+              { name: 'priority-medium', color: 'fbca04', description: 'Important but not urgent' },
+              { name: 'priority-low', color: '0e8a16', description: 'Nice to have' },
+              { name: 'wip', color: '1d76db', description: 'Work in progress' },
+              { name: 'docs-new', color: '3A4520', description: 'New documentation needed' },
+              { name: 'docs-update', color: '464444', description: 'Updates to existing docs' },
+              { name: 'docs-fix', color: 'C90572', description: 'Documentation fixes' },
+              { name: 'tech-review-needed', color: '48C5DA', description: 'Needs technical review' },
+              { name: 'ready-for-review', color: 'F795DF', description: 'Documentation ready for final review' },
+              { name: 'docs-clarity', color: '7B61B1', description: 'Improvements to documentation clarity' },
+              { name: 'has-issue', color: '0E8A16', description: 'PR linked to an issue' }
+            ];
+
+            // Create each label
+            for (const label of labels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.payload.inputs.repo_name,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (error) {
+                console.error(`Failed to create label ${label.name}:`, error);
+              }
+            }
+
             // Set output for next steps
             core.setOutput('project-id', projectId);
 
