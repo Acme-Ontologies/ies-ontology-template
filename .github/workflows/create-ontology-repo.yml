@@ -94,6 +94,8 @@ jobs:
             core.setOutput('project-id', projectId);
 
       - name: Create PROJECT_ID Variable
+        env:
+          GH_TOKEN: ${{ secrets.ACME_ONTOLOGIES_PAT }}
         run: |
           gh api --method POST /repos/${{ github.repository_owner }}/${{ github.event.inputs.repo_name }}/actions/variables \
             -f name='PROJECT_ID' \
