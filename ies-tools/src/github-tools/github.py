@@ -57,6 +57,15 @@ def debug_graphql(cmd: List[str], error: subprocess.CalledProcessError):
         owner = get_repo_owner()
         repo = get_repo_name()
         click.echo(f"\nRepository: {owner}/{repo}")
+
+        # Test basic API access
+        test_cmd = ["gh", "api", f"/repos/{owner}/{repo}"]
+        result = subprocess.run(test_cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            click.echo("\nAPI Access Test Failed:")
+            click.echo(result.stderr)
+        else:
+            click.echo("\nAPI Access Test Succeeded")
     except Exception as e:
         click.echo(f"Could not get repository info: {e}")
 
@@ -90,6 +99,210 @@ def get_default_branch() -> str:
         return data["defaultBranchRef"]["name"]
     except (subprocess.CalledProcessError, KeyError, json.JSONDecodeError):
         return "develop"  # Fallback to develop
+
+
+def get_repo_owner() -> str:
+    """Get repository owner from git remote"""
+    try:
+        remote_url = subprocess.check_output(
+            ["git", "remote", "get-url", "origin"],
+            text=True
+        ).strip()
+        # Handle both HTTPS and SSH URLs
+        if "github.com:" in remote_url:  # SSH
+            owner = remote_url.split("github.com:")[1].split("/")[0]
+        else:  # HTTPS
+            owner = remote_url.split("github.com/")[1].split("/")[0]
+        return owner
+    except (subprocess.CalledProcessError, IndexError):
+        raise click.ClickException("Could not determine repository owner")
+
+
+def get_repo_name() -> str:
+    """Get repository name from git remote"""
+    try:
+        remote_url = subprocess.check_output(
+            ["git", "remote", "get-url", "origin"],
+            text=True
+        ).strip()
+        # Handle both HTTPS and SSH URLs
+        name = remote_url.split("/")[-1].replace(".git", "")
+        return name
+    except (subprocess.CalledProcessError, IndexError):
+        raise click.ClickException("Could not determine repository name")
+
+
+def get_project_id() -> Optional[str]:
+    """Get project ID from repository variables"""
+    try:
+        result = subprocess.run(
+            ["gh", "variable", "list", "--json", "name,value"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        variables = json.loads(result.stdout)
+        for var in variables:
+            if var["name"] == "PROJECT_ID":
+                return var["value"]
+        return None
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        return None
+
+
+def create_issue(
+        title: str, body: str, labels: List[str], issue_type: IssueType
+) -> IssueMetadata:
+    """Create an issue and return its metadata"""
+    try:
+        # Create the issue
+        result = subprocess.run(
+            [
+                "gh",
+                "issue",
+                "create",
+                "--title",
+                f"[{issue_type.name}] {title}",
+                "--body",
+                body,
+                *sum([["-l", label] for label in labels], []),
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        # Extract issue number from URL
+        issue_url = result.stdout.strip()
+        issue_number = issue_url.split("/")[-1]
+
+        # Get the Project ID
+        project_id = get_project_id()
+
+        if project_id:
+            # Construct GraphQL query (on one line)
+            query = "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { issue(number: $number) { id } } }"
+
+            # Get issue node ID
+            issue_query_cmd = [
+                "gh", "api", "graphql",
+                "-f", f"query={query}",
+                "-f", f"owner={get_repo_owner()}",
+                "-f", f"repo={get_repo_name()}",
+                "-f", f"number={int(issue_number)}"
+            ]
+
+            click.echo("🔍 Getting issue ID...")
+            issue_query = subprocess.run(
+                issue_query_cmd,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+
+            issue_data = json.loads(issue_query.stdout)
+            issue_id = issue_data["data"]["repository"]["issue"]["id"]
+
+            # Construct mutation query (on one line)
+            mutation = "mutation($projectId: ID!, $contentId: ID!) { addProjectV2ItemById(input: { projectId: $projectId contentId: $contentId }) { item { id } } }"
+
+            # Add to project
+            click.echo("📌 Adding to project board...")
+            project_mutation_cmd = [
+                "gh", "api", "graphql",
+                "-f", f"query={mutation}",
+                "-f", f"projectId={project_id}",
+                "-f", f"contentId={issue_id}"
+            ]
+
+            project_mutation = subprocess.run(
+                project_mutation_cmd,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+
+            if project_mutation.returncode == 0:
+                click.echo("✨ Added issue to project board")
+        else:
+            click.echo("⚠️  Warning: PROJECT_ID not found. Issue won't be added to project board.")
+
+        # Generate branch name
+        safe_title = re.sub(r"[^a-zA-Z0-9-]", "-", title.lower())
+        branch_name = f"{issue_type.value}/issue-{issue_number}-{safe_title}"
+
+        return IssueMetadata(
+            number=issue_number,
+            title=title,
+            type=issue_type,
+            branch_name=branch_name,
+        )
+
+    except subprocess.CalledProcessError as e:
+        # Print debug information
+        debug_graphql(e.cmd, e)
+        raise click.ClickException(f"Failed to create issue: {e.stderr}")
+
+
+def setup_development_branch(
+        metadata: IssueMetadata, base_branch: str = "develop"
+) -> None:
+    """Set up development branch locally and remotely"""
+    try:
+        # Fetch latest changes
+        subprocess.run(["git", "fetch", "origin"], check=True)
+
+        # Create branch from base
+        subprocess.run(
+            ["git", "checkout", "-b", metadata.branch_name, f"origin/{base_branch}"],
+            check=True,
+        )
+
+        # Create initial commit
+        readme_content = f"""# {metadata.type.name.title()} Implementation
+
+## Overview
+This branch implements {metadata.type.value} #{metadata.number}.
+
+## Development Status
+🚧 In Progress
+
+## Related Issues
+- #{metadata.number}
+"""
+        with open("DEVELOPMENT.md", "w") as f:
+            f.write(readme_content)
+
+        # Commit and push
+        subprocess.run(["git", "add", "DEVELOPMENT.md"], check=True)
+        subprocess.run(
+            [
+                "git",
+                "commit",
+                "-m",
+                f"{metadata.type.value}: initial commit for #{metadata.number}",
+            ],
+            check=True,
+        )
+        subprocess.run(
+            ["git", "push", "-u", "origin", metadata.branch_name], check=True
+        )
+
+        # Add branch reference comment to issue
+        subprocess.run(
+            [
+                "gh",
+                "issue",
+                "comment",
+                metadata.number,
+                "--body",
+                f"🔨 Development branch [`{metadata.branch_name}`](../tree/{metadata.branch_name}) has been created from `{base_branch}`.",
+            ],
+            check=True,
+        )
+
+    except subprocess.CalledProcessError as e:
+        raise click.ClickException(f"Failed to set up branch: {e}")
 
 
 def check_branch_status() -> Tuple[bool, bool, bool]:
@@ -193,229 +406,6 @@ def sync_remote_branch(branch_name: str, force: bool = False):
 
     except subprocess.CalledProcessError as e:
         raise click.ClickException(f"Failed to sync branch: {e}")
-
-
-def create_issue(
-        title: str, body: str, labels: List[str], issue_type: IssueType
-) -> IssueMetadata:
-    """Create an issue and return its metadata"""
-    try:
-        # Create the issue
-        result = subprocess.run(
-            [
-                "gh",
-                "issue",
-                "create",
-                "--title",
-                f"[{issue_type.name}] {title}",
-                "--body",
-                body,
-                *sum([["-l", label] for label in labels], []),
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-
-        # Extract issue number from URL
-        issue_url = result.stdout.strip()
-        issue_number = issue_url.split("/")[-1]
-
-        # Get the Project ID from environment
-        project_id = get_project_id()
-
-        if project_id:
-            # Construct GraphQL query
-            query = """
-                query($owner: String!, $repo: String!, $number: Int!) {
-                    repository(owner: $owner, name: $repo) {
-                        issue(number: $number) {
-                            id
-                        }
-                    }
-                }
-            """
-
-            # Get issue node ID
-            issue_query_cmd = [
-                "gh", "api", "graphql",
-                "-f", f"query={query}",
-                "-f", f"owner={get_repo_owner()}",
-                "-f", f"repo={get_repo_name()}",
-                "-f", f"number={int(issue_number)}"
-            ]
-
-            click.echo("🔍 Getting issue ID...")
-            issue_query = subprocess.run(
-                issue_query_cmd,
-                capture_output=True,
-                text=True,
-                check=True
-            )
-
-            issue_data = json.loads(issue_query.stdout)
-            issue_id = issue_data["data"]["repository"]["issue"]["id"]
-
-            # Construct mutation query
-            mutation = """
-                mutation($projectId: ID!, $contentId: ID!) {
-                    addProjectV2ItemById(input: {
-                        projectId: $projectId
-                        contentId: $contentId
-                    }) {
-                        item {
-                            id
-                        }
-                    }
-                }
-            """
-
-            # Add to project
-            click.echo("📌 Adding to project board...")
-            project_mutation_cmd = [
-                "gh", "api", "graphql",
-                "-f", f"query={mutation}",
-                "-f", f"projectId={project_id}",
-                "-f", f"contentId={issue_id}"
-            ]
-
-            project_mutation = subprocess.run(
-                project_mutation_cmd,
-                capture_output=True,
-                text=True,
-                check=True
-            )
-
-            if project_mutation.returncode == 0:
-                click.echo("✨ Added issue to project board")
-        else:
-            click.echo("⚠️  Warning: PROJECT_ID not found. Issue won't be added to project board.")
-
-        # Generate branch name
-        safe_title = re.sub(r"[^a-zA-Z0-9-]", "-", title.lower())
-        branch_name = f"{issue_type.value}/issue-{issue_number}-{safe_title}"
-
-        return IssueMetadata(
-            number=issue_number,
-            title=title,
-            type=issue_type,
-            branch_name=branch_name,
-        )
-
-    except subprocess.CalledProcessError as e:
-        # Print debug information
-        debug_graphql(e.cmd, e)
-        raise click.ClickException(f"Failed to create issue: {e.stderr}")
-
-
-def get_repo_owner() -> str:
-    """Get repository owner from git remote"""
-    try:
-        remote_url = subprocess.check_output(
-            ["git", "remote", "get-url", "origin"],
-            text=True
-        ).strip()
-        # Handle both HTTPS and SSH URLs
-        if "github.com:" in remote_url:  # SSH
-            owner = remote_url.split("github.com:")[1].split("/")[0]
-        else:  # HTTPS
-            owner = remote_url.split("github.com/")[1].split("/")[0]
-        return owner
-    except (subprocess.CalledProcessError, IndexError):
-        raise click.ClickException("Could not determine repository owner")
-
-
-def get_repo_name() -> str:
-    """Get repository name from git remote"""
-    try:
-        remote_url = subprocess.check_output(
-            ["git", "remote", "get-url", "origin"],
-            text=True
-        ).strip()
-        # Handle both HTTPS and SSH URLs
-        name = remote_url.split("/")[-1].replace(".git", "")
-        return name
-    except (subprocess.CalledProcessError, IndexError):
-        raise click.ClickException("Could not determine repository name")
-
-
-def get_project_id() -> str:
-    """Get project ID from repository variables"""
-    try:
-        result = subprocess.run(
-            ["gh", "variable", "list", "--json", "name,value"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        variables = json.loads(result.stdout)
-        for var in variables:
-            if var["name"] == "PROJECT_ID":
-                return var["value"]
-        raise click.ClickException("PROJECT_ID variable not found")
-    except (subprocess.CalledProcessError, json.JSONDecodeError):
-        raise click.ClickException("Could not retrieve PROJECT_ID")
-
-
-def setup_development_branch(
-        metadata: IssueMetadata, base_branch: str = "develop"
-) -> None:
-    """Set up development branch locally and remotely"""
-    try:
-        # Fetch latest changes
-        subprocess.run(["git", "fetch", "origin"], check=True)
-
-        # Create branch from base
-        subprocess.run(
-            ["git", "checkout", "-b", metadata.branch_name, f"origin/{base_branch}"],
-            check=True,
-        )
-
-        # Create initial commit
-        readme_content = f"""# {metadata.type.name.title()} Implementation
-
-## Overview
-This branch implements {metadata.type.value} #{metadata.number}.
-
-## Development Status
-🚧 In Progress
-
-## Related Issues
-- #{metadata.number}
-"""
-        with open("DEVELOPMENT.md", "w") as f:
-            f.write(readme_content)
-
-        # Commit and push
-        subprocess.run(["git", "add", "DEVELOPMENT.md"], check=True)
-        subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"{metadata.type.value}: initial commit for #{metadata.number}",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            ["git", "push", "-u", "origin", metadata.branch_name], check=True
-        )
-
-        # Add branch reference comment to issue
-        subprocess.run(
-            [
-                "gh",
-                "issue",
-                "comment",
-                metadata.number,
-                "--body",
-                f"🔨 Development branch [`{metadata.branch_name}`](../tree/{metadata.branch_name}) has been created from `{base_branch}`.",
-            ],
-            check=True,
-        )
-
-    except subprocess.CalledProcessError as e:
-        raise click.ClickException(f"Failed to set up branch: {e}")
 
 
 @click.group()
