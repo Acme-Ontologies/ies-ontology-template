@@ -99,6 +99,9 @@ jobs:
 
             ## Acceptance Criteria
             ${context.payload.inputs.acceptance}
+
+            ## Development
+            🔄 Development will be done in branch \`feature/${context.payload.inputs.title.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')}-{issue-number}\`
             `;
             
             try {
@@ -185,12 +188,24 @@ jobs:
           git checkout -b "$BRANCH_NAME"
           
           # Create initial commit with issue reference
-          echo "# Feature Implementation" > feature-implementation.md
+          echo "# Feature Implementation for Issue #$ISSUE_NUMBER" > feature-implementation.md
           echo "" >> feature-implementation.md
           echo "Implements #$ISSUE_NUMBER" >> feature-implementation.md
+          echo "" >> feature-implementation.md
+          echo "## Overview" >> feature-implementation.md
+          echo "This branch implements the feature request from issue #$ISSUE_NUMBER." >> feature-implementation.md
+          echo "" >> feature-implementation.md
+          echo "## Development Status" >> feature-implementation.md
+          echo "🚧 In Progress" >> feature-implementation.md
           
           git add feature-implementation.md
           git commit -m "feat: initial commit for #$ISSUE_NUMBER"
           git push origin "$BRANCH_NAME"
           
           echo "Created branch $BRANCH_NAME"
+          
+          # Update issue with actual branch name
+          gh issue edit $ISSUE_NUMBER --body "$(gh issue view $ISSUE_NUMBER --json body -q .body | sed "s/{issue-number}/$ISSUE_NUMBER/g")"
+          
+          # Add development branch comment to issue
+          gh issue comment $ISSUE_NUMBER --body "🔨 Development branch [\`$BRANCH_NAME\`](../tree/$BRANCH_NAME) has been created from \`develop\`."
