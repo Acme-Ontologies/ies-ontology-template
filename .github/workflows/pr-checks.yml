@@ -1,0 +1,202 @@
+name: Pull Request Workflow
+
+# Future development considerations:
+# 1. Add checks for required approvals based on target branch
+#    - Different approval requirements for develop vs rc vs main
+#    - Consider minimum number of reviewers per target
+#
+# 2. Enforce different code coverage requirements per target branch
+#    - Stricter coverage requirements for rc and main
+#    - Consider blocking merges if coverage decreases
+#
+# 3. Add automated changelog generation based on PR labels
+#    - Group changes by type (feature, bugfix, etc.)
+#    - Auto-update changelog file with merge
+#
+# 4. Implement automated reviewer assignments
+#    - Based on PR type and target branch
+#    - Consider code ownership rules
+#
+# 5. Add conventional commit message enforcement
+#    - Validate PR title/commits follow conventional format
+#    - Block merge if format is incorrect
+#
+# 6. Configure branch protection rules per target
+#    - Stricter rules for rc and main branches
+#    - Consider status checks and merge requirements
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, edited]
+    branches:
+      - develop
+      - rc
+      - main
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  process_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR target branch
+        if: github.event.action == 'opened' || github.event.action == 'edited'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            try {
+              const sourceBranch = pr.head.ref;
+              const targetBranch = pr.base.ref;
+              
+              // Define allowed branch flows
+              const allowedFlows = {
+                'feature/': 'develop',
+                'bugfix/': 'develop',
+                'hotfix/': 'main',
+                'develop': 'rc',
+                'rc': 'main'
+              };
+              
+              // Check if PR is targeting the correct branch
+              let isValidFlow = false;
+              let matchedPrefix = '';
+              
+              // First check for prefix matches
+              for (const [prefix, allowedTarget] of Object.entries(allowedFlows)) {
+                if (sourceBranch.startsWith(prefix) || sourceBranch === prefix) {
+                  isValidFlow = targetBranch === allowedTarget;
+                  matchedPrefix = prefix;
+                  break;
+                }
+              }
+              
+              if (!isValidFlow) {
+                let message = '';
+                if (matchedPrefix) {
+                  message = `⚠️ Invalid target branch. ${matchedPrefix} branches should target \`${allowedFlows[matchedPrefix]}\` branch, not \`${targetBranch}\`.`;
+                } else {
+                  message = `⚠️ Invalid branch flow. Unable to determine the correct target branch for \`${sourceBranch}\`.`;
+                }
+                
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: message
+                });
+                
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  labels: ['invalid-target']
+                });
+              }
+              
+            } catch (error) {
+              console.error('Error validating PR target:', error);
+              core.setFailed(error.message);
+            }
+
+      - name: Process PR labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.ACME_ONTOLOGIES_PAT }}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            try {
+              if (context.payload.action === 'opened' || context.payload.action === 'reopened') {
+                const sourceBranch = pr.head.ref;
+                const targetBranch = pr.base.ref;
+                let labels = ['needs-review'];
+                
+                // Add appropriate flow label
+                if (sourceBranch.startsWith('feature/')) {
+                  labels.push('enhancement');
+                } else if (sourceBranch.startsWith('bugfix/')) {
+                  labels.push('bug');
+                } else if (sourceBranch.startsWith('hotfix/')) {
+                  labels.push('hotfix');
+                } else if (sourceBranch === 'develop' && targetBranch === 'rc') {
+                  labels.push('release-candidate');
+                } else if (sourceBranch === 'rc' && targetBranch === 'main') {
+                  labels.push('production-release');
+                }
+                
+                // Check if PR is linked to an issue (for feature/, bugfix/, hotfix/ branches)
+                if (['feature/', 'bugfix/', 'hotfix/'].some(prefix => sourceBranch.startsWith(prefix))) {
+                  const bodyMatch = pr.body?.match(/(closes|fixes|resolves) #(\d+)/i);
+                  if (bodyMatch) {
+                    const issueNumber = bodyMatch[2];
+                    console.log(`PR is linked to issue #${issueNumber}`);
+                    
+                    // Get linked issue labels
+                    const issue = await github.rest.issues.get({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: parseInt(issueNumber)
+                    });
+                    
+                    // Copy priority, size, and documentation labels from linked issue
+                    issue.data.labels.forEach(label => {
+                      if (label.name.startsWith('priority:') || 
+                          label.name.startsWith('size:') || 
+                          label.name === 'documentation') {
+                        labels.push(label.name);
+                      }
+                    });
+                  } else {
+                    // Add warning comment if no linked issue
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: pr.number,
+                      body: '⚠️ This PR is not linked to any issue. Please link an issue using "Closes #X" or "Fixes #X" in the PR description.'
+                    });
+                    labels.push('needs-link');
+                  }
+                }
+                
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  labels: labels
+                });
+                
+              } else if (context.payload.action === 'closed' && pr.merged) {
+                // Remove review-related labels when PR is merged
+                const labelsToRemove = ['needs-review', 'needs-link', 'invalid-target'];
+                for (const label of labelsToRemove) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: pr.number,
+                      name: label
+                    });
+                  } catch (error) {
+                    // Ignore error if label doesn't exist
+                    if (error.status !== 404) throw error;
+                  }
+                }
+              }
+              
+              console.log('Pull request processed successfully');
+              
+            } catch (error) {
+              console.error('Error processing pull request:', error);
+              core.setFailed(error.message);
+            }

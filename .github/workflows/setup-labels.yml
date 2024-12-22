@@ -23,6 +23,11 @@ jobs:
                 description: 'Something isn\'t working'
               },
               {
+                name: 'hotfix',
+                color: 'd63b5b',
+                description: 'Urgent fixes'
+              },
+              {
                 name: 'documentation',
                 color: '0075ca',
                 description: 'General documentation tasks'
@@ -133,7 +138,17 @@ jobs:
                 color: 'e11d21',
                 description: 'Pull request needs attention (wrong target branch etc.)'
               },
-              
+              {
+                name: 'release-candidate',
+                color: 'f22e32',
+                description: 'Pull request is a release candidate'
+              },
+              {
+                name: 'production-release',
+                color: 'f43f43',
+                description: 'Pull request is a production release'
+              },
+            
               // Documentation-specific labels
               {
                 name: 'docs-new',
