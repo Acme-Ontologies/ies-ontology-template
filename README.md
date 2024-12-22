@@ -74,6 +74,7 @@ TBD
 +
 ```bash
 gh workflow run setup-labels.yml
+gh label list
 ```
 
 ## Development GitHub Workflows

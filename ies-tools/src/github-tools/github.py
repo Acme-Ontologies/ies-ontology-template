@@ -222,7 +222,7 @@ def create_issue(
                  f"query=query($owner: String!, $repo: String!, $number: Int!) {{repository(owner: $owner, name: $repo) {{issue(number: $number) {{id}}}}}}",
                  "-f", f"owner={get_repo_owner()}",
                  "-f", f"repo={get_repo_name()}",
-                 "-f", f"number={issue_number}"],
+                 "-f", f"number={int(issue_number)}"],
                 capture_output=True,
                 text=True,
                 check=True,
