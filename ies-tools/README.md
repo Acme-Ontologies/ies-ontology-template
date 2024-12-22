@@ -1,73 +1,55 @@
 # IES Tools
 
-A collection of automation tools for IES projects. Currently, includes GitHub workflow automation tools with room for expansion.
+## Important
+These common tools are maintained in the [IES Ontology Template](http://github.com/Acme-Ontologies/ies-ontology-template) repository. The tools are automatically updated daily in the domain ontology repositories using the `sync-tools.yml` GitHub workflow.
 
-**Note: This repository is designed to be included as a Git submodule in other repositories and requires the `ies-github-config` repository to be included as a submodule in the same parent directory.**
+**DO NOT MODIFY THE TOOLS IN THIS REPOSITORY DIRECTLY. RATHER MAKE CHANGES IN [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template)**
 
-## Project Structure
+## Overview
+A collection of automation tools for IES projects. Currently, includes:
+
+- a Python script for automating GitHub CLI (`gh`) commands
+- A Just script for automating common tasks
+
+## Directory Structure
 ```ascii
 .
 ├── ies-tools/
 │   └── src/
 │       └── github-tools/     # GitHub automation tools
 │           └── github.py     # CLI for managing GitHub issues and workflows
+│           └── README.md     # Specific README for the GitHub tools script
 ├── tests/                    # Test directory
 │   ├── integration/
 │   └── unit/
-└── pyproject.toml           # Project configuration and dependencies
+├── README.md                 # This README file
 ```
-## Installation
 
-This repository is designed to be included as a Git submodule in other repositories:
-
-```bash
-git submodule add git@github.com:your-username/ies-tools.git tools/ies-tools
-```
-After adding the submodule, install the Python package:
-    
-```bash
-cd tools/ies-tools
-poetry install
-```
 ## Usage
 ### GitHub Tools
 The github-tools package provides a CLI for managing GitHub issues and workflows:
     
 ```bash
 # Create a new feature request
-poetry run gh-tool create-feature
-
-# Create a bug report
-poetry run gh-tool create-bug
-
-# Create a documentation task
-poetry run gh-tool create-docs-task
+poetry run gh-tools create-feature
 
 # Create a pull request
-poetry run gh-tool create-pr
+poetry run gh-tools create-pr
+
+# Sync your local repo with the remote
+poetry run gh-tools sync
 ```
-Run poetry run gh-tool --help to see all available commands.
-### Updating
-To get the latest tools in repositories using this package:
+Run `poetry run gh-tool --help` to see all available commands.
+
+### Justfile
+The Justfile provides a set of common tasks for IES projects. To see all available tasks, run:
+
 ```bash
-git submodule update --remote
-git commit -am "Update IES tools"
-git push
+just --list
 ```
-## Development
-### Setup
-  - Clone the repository
-  - Install dependencies
-```bash
-poetry install
-```
-### Testing
-```bash
-poetry run pytest tests/unit
-poetry run pytest tests/integration
-```
+
 ## Contributing
-  1. Make changes in this repository
-  2. Add tests for new functionality
-  3. Test in a single consumer repository
-  4. Once confirmed working, update other repositories using the update commands above
+  1. Make changes in [IES Ontology Template repository](https://github.com/Acme-Ontologies/ies-ontology-template)
+  2. Add tests for new features
+  3. Test in a "consumer" domain ontology repository craeted from the template
+  4. Once verified, create a PR on the `main` branch. The updated IES tools will be automatically synced to all domain ontology repositories.
