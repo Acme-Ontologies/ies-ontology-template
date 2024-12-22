@@ -59,32 +59,36 @@ jobs:
               const sourceBranch = pr.head.ref;
               const targetBranch = pr.base.ref;
               
-              // Define allowed branch flows
-              const allowedFlows = {
-                'feature/': 'develop',
-                'bugfix/': 'develop',
-                'hotfix/': 'main',
-                'develop': 'rc',
-                'rc': 'main'
-              };
+              // Define allowed branch flows with prefix indicators
+              const allowedFlows = [
+                { source: 'feature/', target: 'develop', isPrefix: true },
+                { source: 'bugfix/', target: 'develop', isPrefix: true },
+                { source: 'hotfix/', target: 'main', isPrefix: true },
+                { source: 'develop', target: 'rc', isPrefix: false },
+                { source: 'rc', target: 'main', isPrefix: false }
+              ];
               
               // Check if PR is targeting the correct branch
               let isValidFlow = false;
-              let matchedPrefix = '';
+              let matchedFlow = null;
               
-              // First check for prefix matches
-              for (const [prefix, allowedTarget] of Object.entries(allowedFlows)) {
-                if (sourceBranch.startsWith(prefix) || sourceBranch === prefix) {
-                  isValidFlow = targetBranch === allowedTarget;
-                  matchedPrefix = prefix;
+              // Check for matches considering prefix vs exact matches
+              for (const flow of allowedFlows) {
+                const matches = flow.isPrefix 
+                  ? sourceBranch.startsWith(flow.source)
+                  : sourceBranch === flow.source;
+                
+                if (matches) {
+                  isValidFlow = targetBranch === flow.target;
+                  matchedFlow = flow;
                   break;
                 }
               }
               
               if (!isValidFlow) {
                 let message = '';
-                if (matchedPrefix) {
-                  message = `⚠️ Invalid target branch. ${matchedPrefix} branches should target \`${allowedFlows[matchedPrefix]}\` branch, not \`${targetBranch}\`.`;
+                if (matchedFlow) {
+                  message = `⚠️ Invalid target branch. ${matchedFlow.source} ${matchedFlow.isPrefix ? 'branches' : 'branch'} should target \`${matchedFlow.target}\` branch, not \`${targetBranch}\`.`;
                 } else {
                   message = `⚠️ Invalid branch flow. Unable to determine the correct target branch for \`${sourceBranch}\`.`;
                 }
