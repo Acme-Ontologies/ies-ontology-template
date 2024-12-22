@@ -92,6 +92,11 @@ gh workflow run feature-request.yml \
   -f type="Core Functionality" \
   -f acceptance="- [ ] Feature works as expected"
 ```
+The workflow creates the feature issue and a feature branch for development. Update your local clone and switch to the new feature branch to start development.
+```bash
+git fetch origin
+git switch feature/[feature-name]-[issue-number]
+```
 
 #### Alternative 2
 Use the provided tools to create standardized issues:
