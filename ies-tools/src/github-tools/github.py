@@ -1,19 +1,3 @@
-def debug_graphql(cmd: List[str], error: subprocess.CalledProcessError):
-    """Debug a GraphQL command failure"""
-    click.echo("\nDebug Information:")
-    click.echo("Command:", " ".join(cmd))
-    click.echo("\nError Output:", error.stderr)
-    click.echo("\nStandard Output:", error.stdout)
-
-    # Try to get more info about the current state
-    try:
-        owner = get_repo_owner()
-        repo = get_repo_name()
-        click.echo(f"\nRepository: {owner}/{repo}")
-    except Exception as e:
-        click.echo(f"Could not get repository info: {e}")
-
-
 import json
 import re
 import subprocess
@@ -59,6 +43,22 @@ def verify_gh_cli():
         raise click.ClickException(
             "Not authenticated with GitHub. Please run 'gh auth login' first."
         )
+
+
+def debug_graphql(cmd: List[str], error: subprocess.CalledProcessError):
+    """Debug a GraphQL command failure"""
+    click.echo("\nDebug Information:")
+    click.echo("Command:", " ".join(cmd))
+    click.echo("\nError Output:", error.stderr)
+    click.echo("\nStandard Output:", error.stdout)
+
+    # Try to get more info about the current state
+    try:
+        owner = get_repo_owner()
+        repo = get_repo_name()
+        click.echo(f"\nRepository: {owner}/{repo}")
+    except Exception as e:
+        click.echo(f"Could not get repository info: {e}")
 
 
 def verify_git_clean():
