@@ -1,3 +1,19 @@
+def debug_graphql(cmd: List[str], error: subprocess.CalledProcessError):
+    """Debug a GraphQL command failure"""
+    click.echo("\nDebug Information:")
+    click.echo("Command:", " ".join(cmd))
+    click.echo("\nError Output:", error.stderr)
+    click.echo("\nStandard Output:", error.stdout)
+
+    # Try to get more info about the current state
+    try:
+        owner = get_repo_owner()
+        repo = get_repo_name()
+        click.echo(f"\nRepository: {owner}/{repo}")
+    except Exception as e:
+        click.echo(f"Could not get repository info: {e}")
+
+
 import json
 import re
 import subprocess
@@ -206,44 +222,74 @@ def create_issue(
         issue_number = issue_url.split("/")[-1]
 
         # Get the Project ID from environment
-        project_id = subprocess.run(
-            ["gh", "variable", "list"],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
+        project_id = get_project_id()
 
-        if "PROJECT_ID" not in project_id:
-            click.echo("⚠️  Warning: PROJECT_ID variable not found. Issue won't be added to project board.")
-        else:
-            # Get issue node ID using GraphQL
+        if project_id:
+            # Construct GraphQL query
+            query = """
+                query($owner: String!, $repo: String!, $number: Int!) {
+                    repository(owner: $owner, name: $repo) {
+                        issue(number: $number) {
+                            id
+                        }
+                    }
+                }
+            """
+
+            # Get issue node ID
+            issue_query_cmd = [
+                "gh", "api", "graphql",
+                "-f", f"query={query}",
+                "-f", f"owner={get_repo_owner()}",
+                "-f", f"repo={get_repo_name()}",
+                "-f", f"number={int(issue_number)}"
+            ]
+
+            click.echo("🔍 Getting issue ID...")
             issue_query = subprocess.run(
-                ["gh", "api", "graphql", "-f",
-                 f"query=query($owner: String!, $repo: String!, $number: Int!) {{repository(owner: $owner, name: $repo) {{issue(number: $number) {{id}}}}}}",
-                 "-f", f"owner={get_repo_owner()}",
-                 "-f", f"repo={get_repo_name()}",
-                 "-f", f"number={int(issue_number)}"],
+                issue_query_cmd,
                 capture_output=True,
                 text=True,
-                check=True,
+                check=True
             )
 
             issue_data = json.loads(issue_query.stdout)
             issue_id = issue_data["data"]["repository"]["issue"]["id"]
 
-            # Add to project using GraphQL
+            # Construct mutation query
+            mutation = """
+                mutation($projectId: ID!, $contentId: ID!) {
+                    addProjectV2ItemById(input: {
+                        projectId: $projectId
+                        contentId: $contentId
+                    }) {
+                        item {
+                            id
+                        }
+                    }
+                }
+            """
+
+            # Add to project
+            click.echo("📌 Adding to project board...")
+            project_mutation_cmd = [
+                "gh", "api", "graphql",
+                "-f", f"query={mutation}",
+                "-f", f"projectId={project_id}",
+                "-f", f"contentId={issue_id}"
+            ]
+
             project_mutation = subprocess.run(
-                ["gh", "api", "graphql", "-f",
-                 f"query=mutation($projectId:ID!, $contentId:ID!) {{addProjectV2ItemById(input: {{projectId: $projectId contentId: $contentId}}) {{item {{id}}}}}}",
-                 "-f", f"projectId={get_project_id()}",
-                 "-f", f"contentId={issue_id}"],
+                project_mutation_cmd,
                 capture_output=True,
                 text=True,
-                check=True,
+                check=True
             )
 
             if project_mutation.returncode == 0:
-                click.echo(f"✨ Added issue to project board")
+                click.echo("✨ Added issue to project board")
+        else:
+            click.echo("⚠️  Warning: PROJECT_ID not found. Issue won't be added to project board.")
 
         # Generate branch name
         safe_title = re.sub(r"[^a-zA-Z0-9-]", "-", title.lower())
@@ -257,6 +303,8 @@ def create_issue(
         )
 
     except subprocess.CalledProcessError as e:
+        # Print debug information
+        debug_graphql(e.cmd, e)
         raise click.ClickException(f"Failed to create issue: {e.stderr}")
 
 
