@@ -38,10 +38,11 @@ See the [.gitHub README.md](.github/README.md) for detailed information about av
 
 After creating a new repository from the template, follow these steps to complete set up:
 
-1. Create the `development` branch from `main`. `feature/*` branches should be created from `development`.
+1. Create the `development` branch from `main`. `feature/*` branches should be created from `development`. Push `development` to the remote repository.
 +
 ```bash
-git branch development
+git branch develop
+git push -u origin develop
 ```
 
 2. Set up poetry / Python environment for ies-tools:
@@ -72,12 +73,27 @@ TBD
 5. Manually run  `.github/workflows/setup-labels.yml` to ensure all project labels are initialised.
 +
 ```bash
-gh workflow setup-labels.yml
+gh workflow run setup-labels.yml
 ```
 
 ## Development GitHub Workflows
 
 ### Creating Issues
+
+#### Alternative 1
+```bash
+# Create a feature request
+gh workflow run feature-request.yml \
+  -f title="My New Feature" \
+  -f problem="Description of the problem" \
+  -f solution="Proposed solution" \
+  -f priority="priority:medium" \
+  -f size="size:m" \
+  -f type="Core Functionality" \
+  -f acceptance="- [ ] Feature works as expected"
+```
+
+#### Alternative 2
 Use the provided tools to create standardized issues:
 
 ```bash
