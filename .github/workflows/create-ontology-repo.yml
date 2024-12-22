@@ -41,7 +41,7 @@ jobs:
               name: context.payload.inputs.repo_name,
               description: context.payload.inputs.repo_description,
               include_all_branches: true,
-              private: context.payload.inputs.is_public === false
+              private: context.payload.inputs.is_public === 'false'
             });
 
             // Get organization ID
