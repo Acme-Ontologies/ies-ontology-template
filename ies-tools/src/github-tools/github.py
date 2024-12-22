@@ -205,6 +205,46 @@ def create_issue(
         issue_url = result.stdout.strip()
         issue_number = issue_url.split("/")[-1]
 
+        # Get the Project ID from environment
+        project_id = subprocess.run(
+            ["gh", "variable", "list"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+
+        if "PROJECT_ID" not in project_id:
+            click.echo("⚠️  Warning: PROJECT_ID variable not found. Issue won't be added to project board.")
+        else:
+            # Get issue node ID using GraphQL
+            issue_query = subprocess.run(
+                ["gh", "api", "graphql", "-f",
+                 f"query=query($owner: String!, $repo: String!, $number: Int!) {{repository(owner: $owner, name: $repo) {{issue(number: $number) {{id}}}}}}",
+                 "-f", f"owner={get_repo_owner()}",
+                 "-f", f"repo={get_repo_name()}",
+                 "-f", f"number={issue_number}"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            issue_data = json.loads(issue_query.stdout)
+            issue_id = issue_data["data"]["repository"]["issue"]["id"]
+
+            # Add to project using GraphQL
+            project_mutation = subprocess.run(
+                ["gh", "api", "graphql", "-f",
+                 f"query=mutation($projectId:ID!, $contentId:ID!) {{addProjectV2ItemById(input: {{projectId: $projectId contentId: $contentId}}) {{item {{id}}}}}}",
+                 "-f", f"projectId={get_project_id()}",
+                 "-f", f"contentId={issue_id}"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            if project_mutation.returncode == 0:
+                click.echo(f"✨ Added issue to project board")
+
         # Generate branch name
         safe_title = re.sub(r"[^a-zA-Z0-9-]", "-", title.lower())
         branch_name = f"{issue_type.value}/issue-{issue_number}-{safe_title}"
@@ -218,6 +258,55 @@ def create_issue(
 
     except subprocess.CalledProcessError as e:
         raise click.ClickException(f"Failed to create issue: {e.stderr}")
+
+
+def get_repo_owner() -> str:
+    """Get repository owner from git remote"""
+    try:
+        remote_url = subprocess.check_output(
+            ["git", "remote", "get-url", "origin"],
+            text=True
+        ).strip()
+        # Handle both HTTPS and SSH URLs
+        if "github.com:" in remote_url:  # SSH
+            owner = remote_url.split("github.com:")[1].split("/")[0]
+        else:  # HTTPS
+            owner = remote_url.split("github.com/")[1].split("/")[0]
+        return owner
+    except (subprocess.CalledProcessError, IndexError):
+        raise click.ClickException("Could not determine repository owner")
+
+
+def get_repo_name() -> str:
+    """Get repository name from git remote"""
+    try:
+        remote_url = subprocess.check_output(
+            ["git", "remote", "get-url", "origin"],
+            text=True
+        ).strip()
+        # Handle both HTTPS and SSH URLs
+        name = remote_url.split("/")[-1].replace(".git", "")
+        return name
+    except (subprocess.CalledProcessError, IndexError):
+        raise click.ClickException("Could not determine repository name")
+
+
+def get_project_id() -> str:
+    """Get project ID from repository variables"""
+    try:
+        result = subprocess.run(
+            ["gh", "variable", "list", "--json", "name,value"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        variables = json.loads(result.stdout)
+        for var in variables:
+            if var["name"] == "PROJECT_ID":
+                return var["value"]
+        raise click.ClickException("PROJECT_ID variable not found")
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        raise click.ClickException("Could not retrieve PROJECT_ID")
 
 
 def setup_development_branch(

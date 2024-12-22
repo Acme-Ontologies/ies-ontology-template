@@ -102,21 +102,14 @@ git switch feature/[feature-name]-[issue-number]
 Use the provided tools to create standardized issues:
 
 ```bash
-# Create a feature request
-poetry run gh-tool create-feature
+# Create a new feature request and set up development branch
+poetry run gh-tools create-feature
 
-# Create a bug report
-poetry run gh-tool create-bug
+# Create a pull request for the current branch
+poetry run gh-tools create-pr
 
-# Create a documentation task
-poetry run gh-tool create-docs-task
-```
-
-### Pull Requests
-Create pull requests using the provided tool:
-
-```bash
-poetry run gh-tool create-pr
+# Sync local repository with remote changes
+poetry run gh-tools sync
 ```
 
 ### Updating GitHub workflows and IES Tools
