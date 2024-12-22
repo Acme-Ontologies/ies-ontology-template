@@ -48,6 +48,15 @@ git push -u origin develop
 2. Set up poetry / Python environment for ies-tools:
 +
 ```bash
+# Install poetry
+# On macOS
+brew install poetry
+# On Ubuntu
+sudo apt-get install poetry
+# On Windows
+TBD
+
+# Install project dependencies
 poetry install
 ```
 3. Verify poetry setup:

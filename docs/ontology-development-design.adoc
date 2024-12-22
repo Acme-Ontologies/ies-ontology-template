@@ -18,8 +18,10 @@
   - [ ] Make ontology-validation work in a domain ontology repo
   - [ ] Add a CONTRIBUTING.md file to the domain ontology repo
   - [ ] Create the CHANGELOG.md file, as example
-
   - [ ] Add Crown copyright notice to the LICENSE file
+  - [ ] Wrap feature commits and issue comments together in a workflow
+  - [ ] TBD
+
 
 === Purpose and Scope
 This ontology aims to provide a standardized vocabulary for the domain. It covers key concepts and relationships.
