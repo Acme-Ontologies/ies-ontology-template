@@ -64,6 +64,7 @@ jobs:
                 { source: 'feature/', target: 'develop', isPrefix: true },
                 { source: 'bugfix/', target: 'develop', isPrefix: true },
                 { source: 'hotfix/', target: 'main', isPrefix: true },
+                { source: 'sync-ies-tools-', target: 'main', isPrefix: true },
                 { source: 'develop', target: 'rc', isPrefix: false },
                 { source: 'rc', target: 'main', isPrefix: false }
               ];

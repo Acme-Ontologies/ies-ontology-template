@@ -159,7 +159,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
           # Create branch
-          branch_name="sync-config-$(date +%Y%m%d-%H%M%S)"
+          branch_name="sync-ies-tools-$(date +%Y%m%d-%H%M%S)"
           git checkout -b $branch_name
           
           # Create PR description
