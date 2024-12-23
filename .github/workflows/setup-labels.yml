@@ -20,7 +20,7 @@ jobs:
               {
                 name: 'bug',
                 color: 'd73a4a',
-                description: 'Something isn\'t working'
+                description: 'Something is not working'
               },
               {
                 name: 'hotfix',
