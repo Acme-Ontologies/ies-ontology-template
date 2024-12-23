@@ -18,7 +18,27 @@ on:
         default: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate repository name
+        run: |
+          REPO_NAME="${{ github.event.inputs.repo_name }}"
+          if [[ "$REPO_NAME" =~ [[:space:]] ]]; then
+            echo "::error::Repository name contains spaces"
+            exit 1
+          fi
+          if [[ "$REPO_NAME" =~ [^a-zA-Z0-9._-] ]]; then
+            echo "::error::Repository name contains invalid characters. Use only letters, numbers, dots, hyphens and underscores"
+            exit 1
+          fi
+          if [[ ${#REPO_NAME} -gt 100 ]]; then
+            echo "::error::Repository name exceeds 100 characters"
+            exit 1
+          fi
+
   create_repository:
+    needs: validate
     runs-on: ubuntu-latest
     permissions:
       contents: write
