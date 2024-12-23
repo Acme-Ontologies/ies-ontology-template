@@ -82,7 +82,11 @@ TBD
 5. Manually run  `.github/workflows/setup-labels.yml` to ensure all project labels are initialised.
 +
 ```bash
+# Run the workflow to set up labels
 gh workflow run setup-labels.yml
+# Fetch the latest changes from the remote repository
+git fetch origin
+# List the labels to verify they were created
 gh label list
 ```
 
