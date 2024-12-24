@@ -1,3 +1,5 @@
+import os
+import sys
 import json
 import re
 import subprocess
@@ -148,6 +150,178 @@ def get_project_id() -> Optional[str]:
         return None
     except (subprocess.CalledProcessError, json.JSONDecodeError):
         return None
+
+
+def setup_develop_branch() -> bool:
+    """Create and push develop branch if it doesn't exist"""
+    try:
+        # Check if develop branch exists locally
+        result = subprocess.run(
+            ["git", "branch", "--list", "develop"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        if not result.stdout.strip():
+            click.echo("🌱 Creating develop branch...")
+            # Get default branch (usually main)
+            default_branch = get_default_branch()
+
+            # Create develop branch from default branch
+            subprocess.run(
+                ["git", "checkout", "-b", "develop", f"origin/{default_branch}"],
+                check=True,
+                capture_output=True,
+            )
+
+            # Push to remote and set upstream
+            click.echo("⬆️  Pushing develop branch to remote...")
+            subprocess.run(
+                ["git", "push", "-u", "origin", "develop"],
+                check=True,
+                capture_output=True,
+            )
+            click.echo("✨ Develop branch created and pushed successfully")
+        else:
+            click.echo("ℹ️  Develop branch already exists")
+        return True
+
+    except subprocess.CalledProcessError as e:
+        click.echo(f"❌ Failed to setup develop branch: {e.stderr}", err=True)
+        return False
+
+
+def setup_labels() -> bool:
+    """Run the labels setup workflow"""
+    try:
+        workflow_path = ".github/workflows/setup-labels.yml"
+
+        # Check if workflow file exists
+        if not os.path.exists(workflow_path):
+            click.echo(f"❌ Workflow file not found: {workflow_path}", err=True)
+            return False
+
+        click.echo("🏷️  Running labels setup workflow...")
+        subprocess.run(
+            ["gh", "workflow", "run", "setup-labels.yml"],
+            check=True,
+            capture_output=True,
+        )
+        click.echo("✨ Labels setup workflow triggered successfully")
+        return True
+
+    except subprocess.CalledProcessError as e:
+        click.echo(f"❌ Failed to run labels workflow: {e.stderr}", err=True)
+        return False
+
+
+def get_platform_type() -> str:
+    """Determine the platform type more accurately"""
+    system = platform.system().lower()
+    if system == "darwin":
+        return "macos"
+    elif system == "linux":
+        return "linux"
+    elif system == "windows":
+        return "windows"
+    else:
+        return "unknown"
+
+
+def check_gh_cli() -> bool:
+    """Check if GitHub CLI is installed"""
+    try:
+        subprocess.run(["gh", "--version"], check=True, capture_output=True)
+        click.echo("✓ GitHub CLI is installed")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        click.echo("❌ GitHub CLI (gh) is not installed", err=True)
+
+        # Provide installation instructions based on platform
+        platform_type = get_platform_type()
+        if platform_type == "macos":
+            click.echo("To install on macOS:")
+            click.echo("  brew install gh")
+        elif platform_type == "linux":
+            click.echo("To install on Linux:")
+            click.echo(
+                "  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg")
+            click.echo(
+                "  echo \"deb [signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list")
+            click.echo("  sudo apt update")
+            click.echo("  sudo apt install gh")
+        elif platform_type == "windows":
+            click.echo("To install on Windows:")
+            click.echo("  winget install GitHub.cli")
+            click.echo("  # or")
+            click.echo("  choco install gh")
+        return False
+
+
+def check_just() -> bool:
+    """Check if just is installed"""
+    try:
+        subprocess.run(["just", "--version"], check=True, capture_output=True)
+        click.echo("✓ just is installed")
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        click.echo("❌ just is not installed", err=True)
+
+        # Provide installation instructions based on platform
+        platform_type = get_platform_type()
+        if platform_type == "macos":
+            click.echo("To install on macOS:")
+            click.echo("  brew install just")
+        elif platform_type == "linux":
+            click.echo("To install on Linux:")
+            click.echo("  curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s")
+        elif platform_type == "windows":
+            click.echo("To install on Windows:")
+            click.echo("  winget install just")
+            click.echo("  # or")
+            click.echo("  choco install just")
+        else:
+            click.echo("Please visit https://just.systems/man/en/chapter_4.html for installation instructions")
+        return False
+
+
+@cli.command()
+def setup_repo():
+    """Set up repository with develop branch and required tools"""
+    success_count = 0
+    total_steps = 3  # Minimum required steps
+
+    click.echo("🔧 Setting up repository...")
+
+    # Check for gh CLI installation
+    check_gh_cli()
+
+    # Check for just installation
+    check_just()
+
+    # Verify GitHub CLI authentication
+    try:
+        verify_gh_cli()
+        click.echo("✓ GitHub CLI authenticated")
+    except click.ClickException as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        return
+
+    # Setup develop branch
+    if setup_develop_branch():
+        success_count += 1
+
+    # Setup labels
+    if setup_labels():
+        success_count += 1
+
+    # Final status report
+    if success_count == total_steps:
+        click.echo("🎉 Repository setup completed successfully!")
+    else:
+        click.echo(f"⚠️  Repository setup completed with {total_steps - success_count} failures")
+        click.echo("Please check the logs above and fix any issues manually")
 
 
 def create_issue(
