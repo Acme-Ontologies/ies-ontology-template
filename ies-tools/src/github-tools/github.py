@@ -286,44 +286,6 @@ def check_just() -> bool:
         return False
 
 
-@cli.command()
-def setup_repo():
-    """Set up repository with develop branch and required tools"""
-    success_count = 0
-    total_steps = 3  # Minimum required steps
-
-    click.echo("🔧 Setting up repository...")
-
-    # Check for gh CLI installation
-    check_gh_cli()
-
-    # Check for just installation
-    check_just()
-
-    # Verify GitHub CLI authentication
-    try:
-        verify_gh_cli()
-        click.echo("✓ GitHub CLI authenticated")
-    except click.ClickException as e:
-        click.echo(f"❌ {str(e)}", err=True)
-        return
-
-    # Setup develop branch
-    if setup_develop_branch():
-        success_count += 1
-
-    # Setup labels
-    if setup_labels():
-        success_count += 1
-
-    # Final status report
-    if success_count == total_steps:
-        click.echo("🎉 Repository setup completed successfully!")
-    else:
-        click.echo(f"⚠️  Repository setup completed with {total_steps - success_count} failures")
-        click.echo("Please check the logs above and fix any issues manually")
-
-
 def create_issue(
         title: str, body: str, labels: List[str], issue_type: IssueType
 ) -> IssueMetadata:
@@ -584,6 +546,44 @@ def sync_remote_branch(branch_name: str, force: bool = False):
 def cli():
     """CLI for managing GitHub issues and workflows"""
     pass
+
+
+@cli.command()
+def setup_repo():
+    """Set up repository with develop branch and required tools"""
+    success_count = 0
+    total_steps = 3  # Minimum required steps
+
+    click.echo("🔧 Setting up repository...")
+
+    # Check for gh CLI installation
+    check_gh_cli()
+
+    # Check for just installation
+    check_just()
+
+    # Verify GitHub CLI authentication
+    try:
+        verify_gh_cli()
+        click.echo("✓ GitHub CLI authenticated")
+    except click.ClickException as e:
+        click.echo(f"❌ {str(e)}", err=True)
+        return
+
+    # Setup develop branch
+    if setup_develop_branch():
+        success_count += 1
+
+    # Setup labels
+    if setup_labels():
+        success_count += 1
+
+    # Final status report
+    if success_count == total_steps:
+        click.echo("🎉 Repository setup completed successfully!")
+    else:
+        click.echo(f"⚠️  Repository setup completed with {total_steps - success_count} failures")
+        click.echo("Please check the logs above and fix any issues manually")
 
 
 @cli.command()
