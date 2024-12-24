@@ -56,8 +56,9 @@ sudo apt-get install poetry
 # On Windows
 TBD
 
-# Install project dependencies
+# Install and update project dependencies
 poetry install
+poetry update
 ```
 3. Verify poetry setup:
 +
@@ -66,7 +67,18 @@ poetry run gh-tools --help
 ```
 If all is well, you should see the help output for the `gh-tools` command, including several available workflows.
 
-4. Install GitHub CLI, `gh`
+4. Commit and push `poetry.lock` to the repository.
+```bash
+git add .
+git commit -m "chore(project): Add poetry.lock"
+git push origin main
+```
+
+5. Run project set-up script to initialise the repository.
+```bash
+poetry run gh-tools setup-repo
+
+5. If necessary, install GitHub CLI, `gh`
 +
 ```bash
 # On macOS
@@ -79,14 +91,13 @@ sudo apt-get install gh
 TBD
 ```
 
-5. Manually run  `.github/workflows/setup-labels.yml` to ensure all project labels are initialised.
-+
+6. Authenticate `gh`
 ```bash
-# Run the workflow to set up labels
-gh workflow run setup-labels.yml
-# Fetch the latest changes from the remote repository
-git fetch origin
-# List the labels to verify they were created
+gh auth login
+```
+
+7. Check repo labels
+```bash
 gh label list
 ```
 
@@ -95,6 +106,20 @@ gh label list
 ### Creating Issues
 
 #### Alternative 1
+Use the provided tools to create issues, PRs, and sync changes:
+
+```bash
+# Create a new feature request and set up development branch
+poetry run gh-tools create-feature
+
+# Create a pull request for the current branch
+poetry run gh-tools create-pr
+
+# Sync local repository with remote changes
+poetry run gh-tools sync
+```
+
+#### Alternative 2
 ```bash
 # Create a feature request
 gh workflow run feature-request.yml \
@@ -110,20 +135,6 @@ The workflow creates the feature issue and a feature branch for development. Upd
 ```bash
 git fetch origin
 git switch feature/[feature-name]-[issue-number]
-```
-
-#### Alternative 2
-Use the provided tools to create standardized issues:
-
-```bash
-# Create a new feature request and set up development branch
-poetry run gh-tools create-feature
-
-# Create a pull request for the current branch
-poetry run gh-tools create-pr
-
-# Sync local repository with remote changes
-poetry run gh-tools sync
 ```
 
 ### Updating GitHub workflows and IES Tools

@@ -552,15 +552,12 @@ def cli():
 def setup_repo():
     """Set up repository with develop branch and required tools"""
     success_count = 0
-    total_steps = 3  # Minimum required steps
+    total_steps = 2  # Minimum required steps
 
     click.echo("🔧 Setting up repository...")
 
     # Check for gh CLI installation
     check_gh_cli()
-
-    # Check for just installation
-    check_just()
 
     # Verify GitHub CLI authentication
     try:
@@ -569,6 +566,9 @@ def setup_repo():
     except click.ClickException as e:
         click.echo(f"❌ {str(e)}", err=True)
         return
+
+    # Check for just installation
+    check_just()
 
     # Setup develop branch
     if setup_develop_branch():
