@@ -38,14 +38,7 @@ See the [.gitHub README.md](.github/README.md) for detailed information about av
 
 After creating a new repository from the template, follow these steps to complete set up:
 
-1. Create the `development` branch from `main`. `feature/*` branches should be created from `development`. Push `development` to the remote repository.
-+
-```bash
-git branch develop
-git push -u origin develop
-```
-
-2. Set up poetry / Python environment for ies-tools:
+1. Set up poetry / Python environment for ies-tools:
 +
 ```bash
 # Install poetry
@@ -60,26 +53,31 @@ TBD
 poetry install
 poetry update
 ```
-3. Verify poetry setup:
+2. Verify poetry setup:
 +
 ```bash
 poetry run gh-tools --help
 ```
 If all is well, you should see the help output for the `gh-tools` command, including several available workflows.
 
-4. Commit and push `poetry.lock` to the repository.
+3. Commit and push `poetry.lock` to the repository.
 ```bash
 git add .
-git commit -m "chore(project): Add poetry.lock"
+git commit -m "chore(project): update poetry.lock"
 git push origin main
 ```
 
-5. Run project set-up script to initialise the repository.
+4. Run project set-up script to initialise the repository. This:
+  - Sets up repository labels
+  - Creates the `develop` branch from `main` and switches to it
+  - Adds IES Core as a Git submodule
+  - Checks for `gh` and `just` CLIs
+
 ```bash
 poetry run gh-tools setup-repo
+```
 
 5. If necessary, install GitHub CLI, `gh`
-+
 ```bash
 # On macOS
 brew install gh
@@ -96,7 +94,19 @@ TBD
 gh auth login
 ```
 
-7. Check repo labels
+7. If necessary, install `just`
+```bash
+# On macOS
+brew install just
+
+# On Ubuntu
+sudo apt-get install just
+
+# On Windows
+TBD
+```
+
+8. Check repo labels
 ```bash
 gh label list
 ```

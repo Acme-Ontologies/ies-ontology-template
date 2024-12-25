@@ -152,6 +152,38 @@ def get_project_id() -> Optional[str]:
         return None
 
 
+def setup_submodules() -> bool:
+    """Initialize and update required git submodules"""
+    try:
+        core_repo = "https://github.com/Acme-Ontologies/ies-core.git"
+        submodule_path = "core"
+
+        click.echo("🔍 Checking submodules...")
+
+        # Check if submodule already exists
+        if not os.path.exists(os.path.join(submodule_path, ".git")):
+            click.echo("🔗 Adding core submodule...")
+            subprocess.run(
+                ["git", "submodule", "add", core_repo, submodule_path],
+                check=True,
+                capture_output=True,
+            )
+
+        # Update the submodule
+        subprocess.run(
+            ["git", "submodule", "update", "--init", "--recursive"],
+            check=True,
+            capture_output=True,
+        )
+
+        click.echo("✨ Submodules setup completed")
+        return True
+
+    except subprocess.CalledProcessError as e:
+        click.echo(f"❌ Failed to setup submodules: {e.stderr}", err=True)
+        return False
+
+
 def setup_develop_branch() -> bool:
     """Create and push develop branch if it doesn't exist"""
     try:
@@ -552,12 +584,15 @@ def cli():
 def setup_repo():
     """Set up repository with develop branch and required tools"""
     success_count = 0
-    total_steps = 2  # Minimum required steps
+    total_steps = 3  # Minimum required steps
 
     click.echo("🔧 Setting up repository...")
 
     # Check for gh CLI installation
     check_gh_cli()
+
+    # Check for just installation
+    check_just()
 
     # Verify GitHub CLI authentication
     try:
@@ -567,8 +602,9 @@ def setup_repo():
         click.echo(f"❌ {str(e)}", err=True)
         return
 
-    # Check for just installation
-    check_just()
+    # Setup submodules
+    if setup_submodules():
+        success_count += 1
 
     # Setup develop branch
     if setup_develop_branch():
