@@ -1,0 +1,31 @@
+digraph ontology {
+   rankdir=BT;
+   node [shape=box, style=filled, fillcolor=lightgray];
+
+   // Core namespaces
+   subgraph cluster_core {
+       label="IES Core";
+       style=dashed;
+       Entity [fillcolor=lightblue];
+   }
+
+   // Domain namespaces
+   subgraph cluster_domain {
+       label="IES Domain";
+       style=dashed;
+       MyDomainEntity [fillcolor=lightgreen];
+   }
+
+   // Class hierarchies
+   MyDomainEntity -> Entity [label="rdfs:subClassOf"];
+
+   // Properties
+   hasRelation [shape=diamond, fillcolor=pink];
+   hasValue [shape=diamond, fillcolor=yellow];
+
+   // Property connections
+   hasRelation -> MyDomainEntity [label="rdfs:domain"];
+   hasRelation -> MyDomainEntity [label="rdfs:range"];
+   hasValue -> MyDomainEntity [label="rdfs:domain"];
+}
+

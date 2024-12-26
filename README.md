@@ -175,8 +175,23 @@ If there are updates, review the new PR and merge it into the local repository.
 ## Contributing
 Please see [Contributing Guide](docs/CONTRIBUTING) for guidelines on how to contribute to this ontology project.
 
-## License
-This ontology repository is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+## Licensing
+
+This project is licensed under the MIT License - see the [LICENCE](LICENCE) file for details.
+
+### Licence Choice
+While UK government works typically use the Open Government License (OGL v3.0), this project uses the MIT License because:
+- It's widely recognized in the software and ontology communities
+- It encourages broader adoption and reuse
+- It's compatible with most other open source licenses
+- It's simple to understand and comply with
+
+### Attribution
+When using this ontology, please include the attribution:
+> © Crown Copyright 2024, Department for Business and Trade
+
+### Third Party Components
+This project includes third party software and tools under different licenses. See individual dependency documentation for details.
 
 ## Changelog
 See [CHANGELOG](CHANGELOG) for a list of changes in each release.

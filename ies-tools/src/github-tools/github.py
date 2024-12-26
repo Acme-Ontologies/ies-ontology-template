@@ -415,65 +415,71 @@ def create_issue(
         raise
 
 
-def setup_development_branch(
-        metadata: IssueMetadata, base_branch: str = "develop"
-) -> None:
-    """Set up development branch locally and remotely"""
+def setup_branches() -> bool:
+    """Create and push develop and rc branches if they don't exist"""
     try:
-        # Fetch latest changes
-        subprocess.run(["git", "fetch", "origin"], check=True)
+        # Get default branch (usually main)
+        default_branch = get_default_branch()
 
-        # Create branch from base
-        subprocess.run(
-            ["git", "checkout", "-b", metadata.branch_name, f"origin/{base_branch}"],
+        # Get list of existing branches
+        result = subprocess.run(
+            ["git", "branch", "--list"],
+            capture_output=True,
+            text=True,
             check=True,
         )
+        existing_branches = result.stdout.strip().split('\n')
+        existing_branches = [b.strip('* ') for b in existing_branches]
 
-        # Create initial commit
-        readme_content = f"""# {metadata.type.name.title()} Implementation
+        # Setup develop branch
+        if 'develop' not in existing_branches:
+            click.echo("🌱 Creating develop branch...")
+            subprocess.run(
+                ["git", "checkout", "-b", "develop", f"origin/{default_branch}"],
+                check=True,
+                capture_output=True,
+            )
+            click.echo("⬆️  Pushing develop branch to remote...")
+            subprocess.run(
+                ["git", "push", "-u", "origin", "develop"],
+                check=True,
+                capture_output=True,
+            )
 
-## Overview
-This branch implements {metadata.type.value} #{metadata.number}.
+        # Setup rc branch
+        if 'rc' not in existing_branches:
+            click.echo("🌱 Creating rc branch...")
+            subprocess.run(
+                ["git", "checkout", f"origin/{default_branch}"],
+                check=True,
+                capture_output=True,
+            )
+            subprocess.run(
+                ["git", "checkout", "-b", "rc"],
+                check=True,
+                capture_output=True,
+            )
+            click.echo("⬆️  Pushing rc branch to remote...")
+            subprocess.run(
+                ["git", "push", "-u", "origin", "rc"],
+                check=True,
+                capture_output=True,
+            )
 
-## Development Status
-🚧 In Progress
+        # Ensure we end up on develop branch
+        if not 'develop' in existing_branches:
+            subprocess.run(
+                ["git", "checkout", "develop"],
+                check=True,
+                capture_output=True,
+            )
 
-## Related Issues
-- #{metadata.number}
-"""
-        with open("DEVELOPMENT.md", "w") as f:
-            f.write(readme_content)
-
-        # Commit and push
-        subprocess.run(["git", "add", "DEVELOPMENT.md"], check=True)
-        subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"{metadata.type.value}: initial commit for #{metadata.number}",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            ["git", "push", "-u", "origin", metadata.branch_name], check=True
-        )
-
-        # Add branch reference comment to issue
-        subprocess.run(
-            [
-                "gh",
-                "issue",
-                "comment",
-                metadata.number,
-                "--body",
-                f"🔨 Development branch [`{metadata.branch_name}`](../tree/{metadata.branch_name}) has been created from `{base_branch}`.",
-            ],
-            check=True,
-        )
+        click.echo("✨ Branches setup completed")
+        return True
 
     except subprocess.CalledProcessError as e:
-        raise click.ClickException(f"Failed to set up branch: {e}")
+        click.echo(f"❌ Failed to setup branches: {e.stderr}", err=True)
+        return False
 
 
 def check_branch_status() -> Tuple[bool, bool, bool]:
@@ -611,8 +617,8 @@ def setup_repo():
     if setup_submodules():
         success_count += 1
 
-    # Setup develop branch
-    if setup_develop_branch():
+    # Setup branches
+    if setup_branches():
         success_count += 1
 
     # Setup labels
