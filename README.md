@@ -172,8 +172,45 @@ poetry run sync-tools
 
 If there are updates, review the new PR and merge it into the local repository.
 
+## IES Core
+
+**DO NOT CHANGE IES CORE form this repository. Instead, go directly to IES Core repo and use the development workflow to propose changes for PR and review**
+
+This ontology repository uses IES Core as a submodule. To update IES Core, run the following commands:
+
+```bash
+# Update IES Core submodule
+git submodule update --remote --merge
+```
+
+For further details on IES Core, see the [IES Core README.md](core/README.md).
+
+## IES Tools
+
+See the [IES Tools README.md](ies-tools/README.md) for details on the tools available for ontology development.
+
+## GitHub Workflows
+
+See the [.github README.md](.github/README.md) for detailed information about available workflows and templates.
+
+## Commitizen
+
+See the [Commitizen guidance](./docs/COMMITIZEN.md) for details on how we prefer to format Git commits.
+
+## Ontology Narrative Documentation
+
+See the [Narrative Documentation guidance](./docs/README.md) for details on how to write narrative documentation for the ontology.
+
+## Builds
+
+This repository uses GitHub Actions for CI/CD. The build artifacts are stored in the `build/` directory.
+
+We follow DRY (Don't Repeat Yourself) principles, meaning, for example, that ontology files are always mastered in `.ttl` files, and other RDF formats are generated from these files and stored in `./build/`.
+
+See the [Builds guidance](./build/README.md) for more details.
+
 ## Contributing
-Please see [Contributing Guide](docs/CONTRIBUTING) for guidelines on how to contribute to this ontology project.
+Please see [Contributing Guide](./docs/CONTRIBUTING) for guidelines on how to contribute to this ontology project.
 
 ## Licensing
 
