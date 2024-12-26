@@ -589,7 +589,7 @@ def cli():
 def setup_repo():
     """Set up repository with develop branch and required tools"""
     success_count = 0
-    total_steps = 4  # Minimum required steps
+    total_steps = 3  # Minimum required steps
 
     click.echo("🔧 Setting up repository...")
 
