@@ -155,6 +155,11 @@ def get_project_id() -> Optional[str]:
 def setup_submodules() -> bool:
     """Initialize and update required git submodules"""
     try:
+        # Skip if we are in the ies-core repository
+        if get_repo_name() == "ies-core":
+            click.echo("ℹ️  Skipping submodule setup in ies-core repository")
+            return True
+
         core_repo = "https://github.com/Acme-Ontologies/ies-core.git"
         submodule_path = "core"
 
@@ -584,7 +589,7 @@ def cli():
 def setup_repo():
     """Set up repository with develop branch and required tools"""
     success_count = 0
-    total_steps = 3  # Minimum required steps
+    total_steps = 4  # Minimum required steps
 
     click.echo("🔧 Setting up repository...")
 
@@ -620,7 +625,6 @@ def setup_repo():
     else:
         click.echo(f"⚠️  Repository setup completed with {total_steps - success_count} failures")
         click.echo("Please check the logs above and fix any issues manually")
-
 
 @cli.command()
 @click.option(

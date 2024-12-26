@@ -63,7 +63,7 @@ If all is well, you should see the help output for the `gh-tools` command, inclu
 3. Commit and push `poetry.lock` to the repository.
 ```bash
 git add .
-git commit -m "chore(project): update poetry.lock"
+git commit -m "chore(project): update poetry"
 git push origin main
 ```
 
