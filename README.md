@@ -63,7 +63,7 @@ If all is well, you should see the help output for the `gh-tools` command, inclu
 3. Commit and push `poetry.lock` to the repository.
 ```bash
 git add .
-git commit -m "chore(project): update poetry"
+git commit -m "chore(project): update poetry dependencies"
 git push origin main
 ```
 
@@ -77,7 +77,19 @@ git push origin main
 poetry run gh-tools setup-repo
 ```
 
-5. If necessary, install GitHub CLI, `gh`
+5. If this ontology repository is _not_ `ies-core`, then commit and push the submodule changes.
+```bash
+# We're in `develop` branch
+git add .
+git commit -m "chore(project): add IES Core submodule"
+git push origin develop
+# Merge to `main` branch
+git switch main
+git merge develop
+git push origin main
+```
+
+6. If necessary, install GitHub CLI, `gh`
 ```bash
 # On macOS
 brew install gh
@@ -89,12 +101,12 @@ sudo apt-get install gh
 TBD
 ```
 
-6. Authenticate `gh`
+7. Authenticate `gh`
 ```bash
 gh auth login
 ```
 
-7. If necessary, install `just`
+8. If necessary, install `just`
 ```bash
 # On macOS
 brew install just
@@ -106,7 +118,7 @@ sudo apt-get install just
 TBD
 ```
 
-8. Check repo labels
+9. Check repo labels
 ```bash
 gh label list
 ```

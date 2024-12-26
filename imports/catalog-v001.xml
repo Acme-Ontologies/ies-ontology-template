@@ -5,6 +5,7 @@
 # updated with the actual content.           #
 ##############################################
 -->
+<!-- ToDo - replace the following URIs with the actual URIs of the ontologies -->
 <catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
     <!-- Main ontology -->
     <uri id="Main" name="http://example.org/ontology/main" uri="file:/src/ontology/ontology.ttl"/>
@@ -20,7 +21,6 @@
 
     <!-- Project-specific external ontologies -->
     <uri id="Imports" name="http://example.org/external/domain-ontology" uri="file:/imports/domain-ontology.owl"/>
-    <uri id="Imports" name="http://example.org/external/application-ontology" uri="file:/imports/application-ontology.ttl"/>
 
     <!-- Validation shapes -->
     <uri id="Imports" name="http://example.org/shapes/main-shapes" uri="file:/tests/validation/shapes/main-shapes.ttl"/>
