@@ -1,11 +1,8 @@
-= Ontology Development Design Document
-:toc: left
-:toclevels: 3
-:sectnums:
+# Ontology Development Design Document
 
-== Project Overview
+## Project Overview
 
-=== ToDo
+### ToDo
 
   - [ ] Add DOCUMENT_ID and DOCUMENT_DRAFT_STATUS_ID to project secrets
   - [ ] Note to add the `ACME-ONTOLOGIES-PAT` token as a repo secret for each domain ontology repo
@@ -23,195 +20,196 @@
   - [ ] TBD
 
 
-=== Purpose and Scope
+### Purpose and Scope
 This ontology aims to provide a standardized vocabulary for the domain. It covers key concepts and relationships.
 
-=== Target Users/Stakeholders
+### Target Users/Stakeholders
 Primary users include domain experts, data scientists, and application developers who need to work with domain data.
 
-=== Use Cases
+### Use Cases
 Key use cases include data integration, knowledge representation, and semantic search capabilities.
 
-=== Competency Questions
+### Competency Questions
 List of questions the ontology must be able to answer, driving the development of terms and relationships.
 
-== Domain Ontology Structure
+## Domain Ontology Structure
 
-=== Directory Structure
+### Directory Structure
 Project follows a standardized directory structure supporting development, testing, and documentation needs.
 
-=== File Organization
+### File Organization
 Files are organized by type and purpose, with clear separation of concerns.
 
-=== Naming Conventions
+### Naming Conventions
 Standardized naming patterns for files, classes, properties, and instances.
 
-=== URI/IRI Patterns
+### URI/IRI Patterns
 Defined patterns for URI/IRI construction ensuring consistency and maintainability.
 
-=== Modularization Strategy
+### Modularization Strategy
 Approach to breaking down the ontology into manageable, maintainable modules.
 
-== Development Methodology
+## Development Methodology
 
-=== Development Lifecycle
+### Development Lifecycle
 Iterative development process with defined stages from conception to deployment.
 
-=== Design Patterns and Guidelines
+### Design Patterns and Guidelines
 Standard patterns and best practices for ontology development.
 
-=== Reuse Strategy
+### Reuse Strategy
 Strategy for incorporating existing ontologies and managing dependencies.
 
-=== Tool Selection
+### Tool Selection
 Selected tools and technologies for development, testing, and deployment.
 
-== Versioning
+## Versioning
 
-=== Version Numbering Scheme
+### Version Numbering Scheme
 Semantic versioning approach adapted for ontology development.
 
-=== Version Control Workflow
+### Version Control Workflow
 Git-based workflow for managing changes and versions.
 
-=== Changelog Management
+### Changelog Management
 Process for maintaining and updating change history.
 
-=== Deprecation Policy
+### Deprecation Policy
 Guidelines for deprecating and removing terms.
 
-=== Backward Compatibility
+### Backward Compatibility
 Requirements and guidelines for maintaining compatibility across versions.
 
-== Workflows
+## Workflows
 
-=== Development Workflow
+### Development Workflow
 Step-by-step process for making and reviewing changes.
 
-=== Issue Tracking
+### Issue Tracking
 Process for managing bugs, features, and improvements.
 
-=== Pull Request Process
+### Pull Request Process
 Guidelines for submitting and reviewing changes.
 
-=== Review Requirements
+### Review Requirements
 Criteria and process for code review and approval.
 
-=== CI/CD Pipeline
+### CI/CD Pipeline
 Automated testing and deployment pipeline configuration.
 
-== Testing Framework
+## Testing Framework
 
-=== Test Types and Organization
+### Test Types and Organization
 Different types of tests and their organization within the project.
 
-=== Validation Approach
+### Validation Approach
 Methods for validating ontology consistency and correctness.
 
-=== Quality Metrics
+### Quality Metrics
 Defined metrics for measuring ontology quality.
 
-=== Test Coverage Requirements
+### Test Coverage Requirements
 Required coverage levels for different types of tests.
 
-=== Acceptance Criteria
+### Acceptance Criteria
 Criteria for accepting new changes into the ontology.
 
-== Release Management
+## Release Management
 
-=== Release Process
+### Release Process
 Step-by-step process for creating and publishing releases.
 
-=== QA Stages
+### QA Stages
 Quality assurance stages and requirements.
 
-=== Release Candidate Criteria
+### Release Candidate Criteria
 Requirements for promoting changes to release candidate status.
 
-=== Publication Process
+### Publication Process
 Process for publishing new versions of the ontology.
 
-=== Distribution Channels
+### Distribution Channels
 Methods and platforms for distributing the ontology.
 
-== Documentation Requirements
+## Documentation Requirements
 
-=== Documentation Types
+### Documentation Types
 Different types of documentation required for the project.
 
-=== API Documentation
+### API Documentation
 Documentation requirements for programmatic interfaces.
 
-=== Usage Guides
+### Usage Guides
 Guidelines for creating user documentation.
 
-=== Example Implementations
+### Example Implementations
 Requirements for providing usage examples.
 
-=== Maintenance Guidelines
+### Maintenance Guidelines
 Guidelines for maintaining and updating documentation.
 
-== Quality Assurance
+## Quality Assurance
 
-=== Quality Criteria
+### Quality Criteria
 Defined criteria for measuring ontology quality.
 
-=== Review Process
+### Review Process
 Process for reviewing and ensuring quality.
 
-=== Validation Requirements
+### Validation Requirements
 Required validation checks and processes.
 
-=== Performance Benchmarks
+### Performance Benchmarks
 Performance requirements and testing approach.
 
-=== Compliance Checks
+### Compliance Checks
 Checks for ensuring compliance with standards and requirements.
 
-== Maintenance and Governance
+## Maintenance and Governance
 
-=== Maintenance Schedule
+### Maintenance Schedule
 Regular maintenance activities and schedule.
 
-=== Contribution Guidelines
+### Contribution Guidelines
 Guidelines for contributing to the ontology.
 
-=== Governance Model
+### Governance Model
 Structure and process for project governance.
 
-=== Issue Resolution
+### Issue Resolution
 Process for resolving conflicts and issues.
 
-=== Community Engagement
+### Community Engagement
 Approach to engaging with the user community.
 
-== Technical Implementation
+## Technical Implementation
 
-=== Tooling Requirements
+### Tooling Requirements
 Required tools and technologies.
 
-=== Build Process
+### Build Process
 Process for building and packaging the ontology.
 
-=== Deployment Strategy
+### Deployment Strategy
 Strategy for deploying new versions.
 
-=== Integration Requirements
+### Integration Requirements
 Requirements for integrating with other systems.
 
-=== Performance Considerations
+### Performance Considerations
 Performance requirements and optimization strategies.
 
-== Security and Access Control
+## Security and Access Control
 
-=== Access Management
+### Access Management
 Managing access to ontology resources.
 
-=== Permissions Model
+### Permissions Model
 Roles and permissions for different users.
 
-=== Security Considerations
+### Security Considerations
 Security requirements and measures.
 
-=== Data Privacy Requirements
+### Data Privacy Requirements
 Requirements for handling sensitive data.
+

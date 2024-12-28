@@ -34,7 +34,7 @@ The repository follows the IES standardized structure for ontology development:
 * `ies-tools/` - Development tools
 
 ## Initial Setup
-See the [.gitHub README.md](.github/README.md) for detailed information about available workflows and templates.
+See the [.gitHub README.md][gh-readme] for detailed information about available workflows and templates.
 
 After creating a new repository from the template, follow these steps to complete set up:
 
@@ -160,7 +160,7 @@ git switch feature/[feature-name]-[issue-number]
 ```
 
 ### Updating GitHub workflows and IES Tools
-The special GitHub workflow `sync-tools.yml` is scheduled to run daily to update the common IES workflows and tools from the [IES Ontology Template](https://github.com/Acme-Ontologies/ies-ontology-template).
+The special GitHub workflow `sync-tools.yml` is scheduled to run daily to update the common IES workflows and tools from the [IES Ontology Template][ont-template]
 When updates are available, a PR will be created ready to be reviewed and merged into the local repository.
 
 Alternatively, the workflow can be triggered manually by running the following commands:
@@ -183,23 +183,23 @@ This ontology repository uses IES Core as a submodule. To update IES Core, run t
 git submodule update --remote --merge
 ```
 
-For further details on IES Core, see the [IES Core README.md](core/README.md).
+For further details on IES Core, see the [IES Core README.md][ies-core].
 
 ## IES Tools
 
-See the [IES Tools README.md](ies-tools/README.md) for details on the tools available for ontology development.
+See the [IES Tools README.md][ies-tools] for details on the tools available for ontology development.
 
 ## GitHub Workflows
 
-See the [.github README.md](.github/README.md) for detailed information about available workflows and templates.
+See the [.github README.md][gh-readme] for detailed information about available workflows and templates.
 
 ## Commitizen
 
-See the [Commitizen guidance](./docs/COMMITIZEN.md) for details on how we prefer to format Git commits.
+See the [Commitizen guidance][commit-readme] for details on how we prefer to format Git commits.
 
 ## Ontology Narrative Documentation
 
-See the [Narrative Documentation guidance](./docs/README.md) for details on how to write narrative documentation for the ontology.
+See the [Narrative Documentation guidance][docs-readme] for details on how to write narrative documentation for the ontology.
 
 ## Builds
 
@@ -207,21 +207,18 @@ This repository uses GitHub Actions for CI/CD. The build artifacts are stored in
 
 We follow DRY (Don't Repeat Yourself) principles, meaning, for example, that ontology files are always mastered in `.ttl` files, and other RDF formats are generated from these files and stored in `./build/`.
 
-See the [Builds guidance](./build/README.md) for more details.
+See the [Builds guidance][build-readme] for more details.
 
 ## Contributing
-Please see [Contributing Guide](./docs/CONTRIBUTING) for guidelines on how to contribute to this ontology project.
+Please see [Contributing Guide][docs-contrib] for guidelines on how to contribute to this ontology project.
 
 ## Licensing
 
-This project is licensed under the MIT License - see the [LICENCE](LICENCE) file for details.
+Unless stated otherwise, the ontology definitions and codebase are released under [the MIT License][mit].
+This covers both the [ontology src][src] and any sample code in the [documentation][docs].
 
-### Licence Choice
-While UK government works typically use the Open Government License (OGL v3.0), this project uses the MIT License because:
-- It's widely recognized in the software and ontology communities
-- It encourages broader adoption and reuse
-- It's compatible with most other open source licenses
-- It's simple to understand and comply with
+The documentation is [© Crown copyright][copyright] and available under the terms
+of the [Open Government 3.0][ogl] licence.
 
 ### Attribution
 When using this ontology, please include the attribution:
@@ -231,7 +228,29 @@ When using this ontology, please include the attribution:
 This project includes third party software and tools under different licenses. See individual dependency documentation for details.
 
 ## Changelog
-See [CHANGELOG](CHANGELOG) for a list of changes in each release.
+See [CHANGELOG][CHANGELOG] for a list of changes in each release.
 
 ## Version
-Current version information is maintained in the [VERSION](VERSION) file.
+Current version information is maintained in the [VERSION][VERSION] file.
+
+## Vulnerability Disclosure
+
+GOV.UK Pay aims to stay secure for everyone. If you are a security researcher and have discovered a security vulnerability in this repository, we appreciate your help in disclosing it to us in a responsible manner. Please refer to our [vulnerability disclosure policy][vul] and our [security.txt][sec] file for details.
+
+[build-readme]: build/README.md
+[CHANGELOG]: CHANGELOG.md
+[commit-readme]: docs/COMMITIZEN.md
+[copyright]: https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/
+[docs]: docs/README.md
+[docs-contrib]: docs/CONTRIBUTING.md
+[docs-readme]: docs/README.md
+[gh-readme]: .github/README.md
+[ies-core]: core/README.md
+[ies-tools]: ies-tools/README.md
+[mit]: LICENCE
+[ogl]: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+[ont-template]: https://github.com/Acme-Ontologies/ies-ontology-template
+[sec]: https://vdp.cabinetoffice.gov.uk/.well-known/security.txt
+[src]: src/README.md
+[VERSION]: VERSION
+[vul]: https://www.gov.uk/help/report-vulnerability

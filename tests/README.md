@@ -1,4 +1,6 @@
-ToDo:
+# Tests
+
+## ToDo:
 
   - Test setup instructions
   - How to run tests
