@@ -11,22 +11,12 @@ body:
         Thanks for taking the time to propose a new feature! Please fill out this form as completely as possible.
 
   - type: textarea
-    id: problem
+    id: description
     attributes:
-      label: Problem Statement
+      label: Feature Description
       description: What problem does this feature solve? Please describe.
       placeholder: |
         A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-    validations:
-      required: true
-
-  - type: textarea
-    id: solution
-    attributes:
-      label: Proposed Solution
-      description: Describe the solution you'd like to see implemented
-      placeholder: |
-        A clear and concise description of what you want to happen.
     validations:
       required: true
 
@@ -55,33 +45,6 @@ body:
         - size:xl (2+ weeks)
     validations:
       required: true
-
-  - type: dropdown
-    id: type
-    attributes:
-      label: Type of Change
-      description: What areas does this feature affect?
-      multiple: true
-      options:
-        - Core Functionality
-        - Documentation
-        - Tests
-        - Performance
-        - User Interface
-        - Build System
-        - Dependencies
-    validations:
-      required: true
-
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional Context
-      description: Add any other context about the feature here
-      placeholder: |
-        Add any other context, screenshots, or examples about the feature request here.
-    validations:
-      required: false
 
   - type: textarea
     id: acceptance

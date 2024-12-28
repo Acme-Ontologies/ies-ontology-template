@@ -706,7 +706,7 @@ def create_feature(
         )
 
         # Set up development branch
-        setup_development_branch(metadata)
+        setup_develop_branch()
         click.echo(
             f"🌿 Created and switched to branch '{metadata.branch_name}'"
         )

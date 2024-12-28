@@ -16,14 +16,15 @@ This directory contains the core ontology files and associated resources for the
 
 1. Keep ontology definitions in `ontology.ttl` and use `data.ttl` for instance data
 2. Create new competency questions in the `competencies/` directory using SPARQL
-3. Each file should focus on a single aspect of the domain
+3. Consider creating sub-files for modular ontology development following separation of concerns (e.g., `organization.ttl`, `process.ttl`, `product.ttl`). This helps manage complexity while maintaining semantic cohesion within the domain
 
 ### Naming Conventions
 
 - Use CamelCase for class names (e.g., `domain:MyDomainEntity`)
 - Use camelCase for property names (e.g., `domain:hasRelation`)
 - Prefix all terms with the domain namespace
-- Use descriptive labels in English (GB)
+- Use descriptive labels in English (GB) with appropriate language tags (e.g., `rdfs:label "Manufacturing Process"@en-GB`)
+- Form class names using singular nouns or noun phrases that clearly identify the concept (e.g., `domain:ManufacturingProcess`, `domain:QualitySpecification`, `domain:ProductComponent`)
 
 ### Best Practices
 

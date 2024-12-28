@@ -1,14 +1,13 @@
 # Feature Request Workflow System
 
-This directory contains a set of GitHub Actions workflows that automate the feature request and development process. The system ensures consistent handling of feature requests from creation through to completion.
+This directory contains a set of GitHub Actions workflows that automate the feature request and development process. This ensures consistent handling of feature requests from creation through to completion.
 
 ## Overview
 
-The system consists of three main components:
-1. Feature request issue template
-2. Issue creation workflow (manual trigger)
-3. Feature request processing workflow (event-triggered)
-4. Label management workflow
+There are three main components:
+1. Feature request issue, `feature-reuest.yml` (manual trigger)
+2. PR checks, `pr-checks.yml` (event-triggered)
+3. Setup repo labels, `setup-labels.yml` (manual trigger)
 
 ### Branch Strategy
 
@@ -28,7 +27,7 @@ A manually triggered workflow for creating new feature requests.
 
 **Local repo usage:**
 ```bash
-gh workflow run feature-request.yml
+gh workflow run create-feature.yml
 git fetch origin
 git branch
 ```
@@ -43,16 +42,14 @@ git switch feature/[feature-name]
 3. Click "Run workflow"
 4. Fill out the form:
    - Feature title
-   - Problem statement
-   - Proposed solution
+   - Feature description
    - Priority level
    - Size estimate
-   - Type of change
    - Acceptance criteria
 
-### 2. Feature Development Workflow (`feature-development.yml`)
+### 2. Automated PR Workflow (`pr-checks.yml`)
 
-Automatically processes feature-related issues and pull requests.
+Automatically processes issues and pull requests.
 
 **Triggers:**
 - Issues: opened, labeled, reopened
@@ -88,6 +85,7 @@ The system uses the following label categories:
 - `invalid` - This doesn't seem right
 - `question` - Further information is requested
 - `wontfix` - This will not be worked on
+- `hotfix` - Urgent production fix
 
 ### Priority Labels
 - `priority:high` - Urgent issues
@@ -107,6 +105,8 @@ The system uses the following label categories:
 - `ready-for-review` - Ready for final review
 - `has-issue` - PR linked to an issue
 - `needs-attention` - Pull request needs attention
+- `production-release` - Pull Request is a production release
+- `release-candidate` - Pull Request is a release candidate
 
 ### Documentation Labels
 - `docs-new` - New documentation needed
@@ -136,23 +136,23 @@ The system uses the following label categories:
    - Required reviews from QA team
    - Labels updated automatically based on status
 
-## Required Secrets
+## Required Secrets and Variables
 
-The workflows require the following secrets to be configured:
-- `ACME_ONTOLOGIES_PAT` - GitHub Personal Access Token with repo scope
-- `PROJECT_ID` - ID of the GitHub Project board
+The workflows require the following secrets and variables to be configured:
+- `ACME_ONTOLOGIES_PAT` - (secret) GitHub Personal Access Token with repo scope
+- `PROJECT_ID` - (variable) ID of the GitHub Project board
 
 ## Customization
 
 To modify the workflow behavior:
 
 1. **Issue Template:**
-   - Edit `.github/ISSUE_TEMPLATE/feature.yml`
+   - Edit `.github/ISSUE_TEMPLATE/create-feature.yml`
    - Update fields, validations, or descriptions
 
 2. **Workflows:**
-   - Edit `feature-request.yml` for issue creation behavior
-   - Edit `feature-development.yml` for development workflow
+   - Edit `create-feature.yml` for issue creation behavior
+   - Edit `pr-checks.yml` for development workflow
    - Modify other `.yml` files in `.github/workflows/` as needed
    - Update triggers, conditions, or actions
 
@@ -174,5 +174,5 @@ Common issues and solutions:
    - Check for error messages in workflow logs
 
 3. **Project Board Issues:**
-   - Verify PROJECT_ID secret is correct
-   - Ensure PAT has required permissions
+   - Verify the GitHug.com PROJECT_ID variable is correct
+   - Ensure the GitHib.com Organization PAT has required permissions

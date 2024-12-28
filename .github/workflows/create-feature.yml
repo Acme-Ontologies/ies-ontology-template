@@ -7,12 +7,8 @@ on:
         description: 'Feature title'
         required: true
         type: string
-      problem:
-        description: 'Problem statement'
-        required: true
-        type: string
-      solution:
-        description: 'Proposed solution'
+      description:
+        description: 'Feature description'
         required: true
         type: string
       priority:
@@ -33,18 +29,6 @@ on:
           - size:m
           - size:l
           - size:xl
-      type:
-        description: 'Type of change (comma-separated if multiple)'
-        required: true
-        type: choice
-        options:
-          - Core Functionality
-          - Documentation
-          - Tests
-          - Performance
-          - User Interface
-          - Build System
-          - Dependencies
       acceptance:
         description: 'Acceptance criteria (bullet points)'
         required: true

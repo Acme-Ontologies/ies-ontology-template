@@ -144,7 +144,7 @@ poetry run gh-tools sync
 #### Alternative 2
 ```bash
 # Create a feature request
-gh workflow run feature-request.yml \
+gh workflow run create-feature.yml \
   -f title="My New Feature" \
   -f problem="Description of the problem" \
   -f solution="Proposed solution" \

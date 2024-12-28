@@ -1,3 +1,34 @@
+# ==============================================================================
+# Pull Request Workflow
+# ==============================================================================
+#
+# This workflow manages the Pull Request process across IES repositories by:
+# 1. Validating PR target branches according to established branch flow rules
+# 2. Automatically applying and managing PR labels
+# 3. Enforcing issue linking for feature, bugfix, and hotfix branches
+# 4. Cleaning up process labels after PR merge
+#
+# Branch Flow Rules:
+# - feature/* -> develop  : Feature development
+# - bugfix/*  -> develop  : Bug fixes in development
+# - hotfix/*  -> main    : Critical production fixes
+# - develop   -> rc      : Release candidate preparation
+# - rc        -> main    : Production release
+#
+# Labels:
+# - Process: needs-review, needs-link, invalid-target
+# - Type: enhancement, bug, hotfix, release-candidate, production-release
+# - Inherited: priority:*, size:*, documentation
+#
+# Required Permissions:
+# - contents: read
+# - issues: write
+# - pull-requests: write
+#
+# Author: Dave Dyke (IES Ontology Team)
+# Last Updated: 2024-12-28
+# ==============================================================================
+
 name: Pull Request Workflow
 
 # Future development considerations:
