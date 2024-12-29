@@ -103,11 +103,8 @@ The IES Ontology family is released under the MIT License, chosen for its permis
 - Private use
 - Sublicensing
 
-### Copyright Management
-- Copyright notices maintained in each ontology file
-- Clear attribution requirements
-- Year and copyright holder information
-- Contribution guidelines
+### Copyright
+- UK Crown Copyright applies to all ontology files, code, and documentation.
 
 ## 1.4. Project Management
 
@@ -134,38 +131,179 @@ Managed through:
 ### Project Tracking
 Each repository includes:
 - GitHub Project board for issue/PR tracking
-- Milestone management
-- Label system for categorization
+- Milestone management (in Jira)
+- Label system for categorization of issues and PRs
 - Automated workflow integration
 
 This infrastructure ensures consistent development practices and maintains high quality across the entire ontology family while enabling efficient collaboration among team members.
 
-## 2. GitHub Organization Setup
-### 2.1. IES-Org Configuration
-- Organization structure
-- Teams and roles
-- Permission levels
-- Required GitHub plan features
+# 2. GitHub Organization Setup
 
-### 2.2. Access Management
-- PAT configuration (IES-ORG-PAT)
-- Organization secrets
-- Repository secrets
-- Environment variables
+## 2.1. IES-Org Configuration
 
-### 2.3. Repository Template
-- Standard repository structure
-- Directory organization
-- Configuration files
-- Required files and their purposes
+### Team Structure
+The IES organization consists of a single team with the following roles:
+- 4 Ontology Developers
+- 1 Project Manager
+- 2 Reviewers
+- 2 Customer/Client Representative
+
+### Permission Requirements
+- Team members require read/write access to:
+  - Repository contents
+  - Issues
+  - Pull requests
+  - Project boards
+
+### GitHub Plan Requirements
+A GitHub Team plan is required for:
+- Supporting the organization's collaborator count
+- Enabling Organization PAT usage on private repositories
+- Managing private repositories for the ontology family
+
+## 2.2. Access Management
+
+### Personal Access Tokens (PATs)
+- The `ACME-ONTOLOGIES-PAT` is the primary token for automation
+- It must be configured as an organization-level secret with the following permissions:
+  - `repository access` (read/write access to all repositories owned by the organization)
+  - `organization` (Read and Write access to organization actions variables, organization projects, and organization secrets)
+  - `repository permissions`
+    - `read` (Read access to all repository metadata)
+    - `read/write` (Read and Write access to actions, actions variables, administration, code, pull requests, and workflows)
+
+### Organization Secrets
+Required organization-level secrets:
+- `ACME-ONTOLOGIES-PAT`: Used for cross-repository operations and automation workflows
+
+### Repository Configuration
+New repositories are created from the [IES Ontology Repository Template][ont-template] using the [create-ontology-repo.yml][create-ontology]. Each repository is configured with:
+- standardised repo labels for issue tracking
+- A set of GitHub workflows for common development tasks
+- IES Tools for local development and automation
+- IES Core ontology as a Git submodule
+- A dedicated GitHub Project for issue and PR tracking
+- `PROJECT_ID` configured as a repository-level variable
+- Additional repository-specific secrets may be added as needed
+
+### Environment Variables
+Currently, no environment-specific variables are required beyond the repository-level configurations.
+
+## 2.3. Repository Template
+
+### Template Customization
+Repository setup is primarily automated through:
+1. The [create-ontology-repo.yml][create-ontology] workflow
+2. The `poetry run gh-tools setup-repo` command, which initializes the repository with standard configurations and checks for required CLI tools
+3. Manual updates required:
+   - Repository README.md to reflect domain ontology name
+   - Any domain-specific documentation
+
+### Branch Configuration
+- Default branch: `main`
+- Release Candidate branch: `rc`
+- Development branch: `develop`
+- Feature branches: `feature/*`
+- Bugfix branches: `bugfix/*`
+- Hotfix branches: `hotfix/*`
+- Branch protection rules and validation checks are yet to be developed
+
+![IES Branch Flows](../build/docs/diagrams/branch-flows.svg)
+
+### Development Flow
+#### Feature and Regular Bugfix Flow
+1. All feature development and regular bug fixes occur in `feature/*` and `bugfix/*` branches
+2. Ontology developer pull requests target the `develop` branch
+3. QA reviewers approve PRs before merging to `develop`
+4. QA Reviewer pull requests target the `rc` branch
+5. QA Reviewer approves PRs before merging to `rc`
+6. Customer/client reviews the release candidate and approves PR to `main`
+7. IES TGG reviews and approves release PRs before final merge to `main`
+8. Changes are backported to `develop` after merging to `main`
+
+#### Hotfix Flow
+1. Critical fixes that can't wait for the regular release cycle are created in `hotfix/*` branches
+2. Hotfix pull requests target the `main` branch directly
+3. Customer/client must review and approve hotfix PRs
+4. IES TGG performs final review before merging to `main`
+5. After merge to `main`, changes should be backported to `develop` to maintain consistency
+
+### Repository Policies
+- No organization-wide policies are currently implemented
+- Repository-specific policies and rules will be developed as needed
+- Future considerations may include:
+  - Branch protection rules
+  - Required status checks
+  - Required review processes
+  - Automated validation requirements
+
+### Template Maintenance
+- Template repository serves as the source of truth for the ontolofy repo structure, IES tools and automation workflows
+- Changes to template structure should be managed through:
+  - Pull requests to template repository
+  - [Synchronization workflow][sync-tools] to propagate workflow and tool changes to ontology repositories
+  - Version control of template components
+
+Clearly, some changes to the template structure, workflows, or GitHub configurations may be required as the ontology family evolves. These changes should be managed through the template repository, but may need to be manually propagated to ontology repos to avoid overwriting local customisations.
 
 ## 3. Development Infrastructure
-### 3.1. Repository Creation and Setup
-- Using create-ontology-repo.yml
-- Repository initialization process
-- Project board setup
-- Label configuration
-- Branch protection rules
+### 3.1 Repository Creation and Setup
+#### 3.1.1 Create Ontology Repository Workflow
+The [create-ontology-repo.yml][create-ont] workflow automates the initialization of new ontology repositories, ensuring consistency across the family of ontologies. This workflow:
+
+1. Creates a new repository from the template
+2. Configures basic repository settings
+3. Sets up the initial directory structure
+4. Establishes required GitHub configurations, including a project board
+
+**Key Configuration Steps:**
+- Repository naming convention enforcement
+- Basic metadata setup (description, topics, visibility)
+- Initial branch creation and protection
+- Documentation template population
+- IES Tools installation and setup
+
+#### 3.1.2 Jira and GitHub Project Boards
+Overall ontology development is managed in jira that is integrated with GitHub project boards (TBD - see below):
+- Jira project setup
+- Sprint planning board
+- Backlog management
+- Release tracking
+- Bug tracking
+
+Additionally, each repository maintains a GitHub project board structure that integrates with the organizational workflow:
+
+- Issue creation
+- Pull Request (PR) management
+- Release tracking and versioning
+- Bug tracking
+
+#### 3.1.3 Ontology repository set-up
+After creation from the template, each ontology repository is configured with the following standard settings:
+- Standard labels are automatically configured for:
+- Issue types (bug, feature, enhancement)
+- Priority levels
+- Development stages
+- Release tracking
+- Documentation needs
+
+This is applied using the `poetry run gh-tools setup-repo` command, which also checks for required CLI tools and sets up the repository for development (see the repository [README.md][repo-readme].
+
+#### 3.1.4 Branch Protection Rules
+TBD - The following branch protection rules are implemented:
+
+- Main branch:
+  - Requires pull request reviews by a customer or IES TGG member
+  - Requires status checks to pass
+  - No direct pushes allowed (other than approved `Hotfix/*` branches)
+  
+- Release candidate (rc) branch:
+  - Similar protections to main
+  - Additional deployment checks
+  
+- Develop branch:
+  - Requires QA review
+  - Automated tests must pass
 
 ### 3.2. GitHub Projects Integration
 - Project board structure
@@ -280,3 +418,8 @@ This infrastructure ensures consistent development practices and maintains high 
 ### C. Workflow Examples
 ### D. Troubleshooting Guide
 ### E. Quick Reference Guides
+
+[ont-template]: https://github.com/IES-Org/ies-ontology-template
+[create-ontology]: https://github.com/Acme-Ontologies/ies-ontology-template/actions/workflows/create-ontology-repo.yml
+[repo-readme]: ../README.md
+[sync-tools]: ../.github/workflows/sync-ies-tools.yml

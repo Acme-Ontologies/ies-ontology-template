@@ -1,22 +1,31 @@
-stateDiagram-v2
-   classDef featureBranch fill:#2196F3,stroke:#0D47A1,stroke-width:2px,color:white
-   classDef bugfixBranch fill:#4CAF50,stroke:#1B5E20,stroke-width:2px,color:white
-   classDef hotfixBranch fill:#F44336,stroke:#B71C1C,stroke-width:2px,color:white
-   classDef syncBranch fill:#9C27B0,stroke:#4A148C,stroke-width:2px,color:white
-   classDef mainBranch fill:#FF9800,stroke:#E65100,stroke-width:2px,color:white
+gitGraph
+    commit id: "Initial"
+    branch develop
+    checkout develop
+    commit id: "Dev Start"
 
-   feature:::featureBranch --> develop
-   bugfix:::bugfixBranch --> develop
-   develop --> rc
-   rc --> main
-   hotfix:::hotfixBranch --> main
-   sync:::syncBranch --> main
+    branch feature/xyz
+    checkout feature/xyz
+    commit id: "Feature Work"
+    checkout develop
+    merge feature/xyz id: "Feature PR to develop" type: HIGHLIGHT tag: "QA Review"
 
-   note right of feature: feature/* branches
-   note right of bugfix: bugfix/* branches
-   note right of hotfix: hotfix/* branches
-   note right of sync: sync-ies-tools-[datetime] branches
+    branch bugfix/abc
+    checkout bugfix/abc
+    commit id: "Bug Fix"
+    checkout develop
+    merge bugfix/abc id: "Bugfix PR to develop" type: HIGHLIGHT tag: "QA Review"
 
-   note right of develop: Development branch
-   note right of rc: Release Candidate
-   note right of main: Production
+    branch rc
+    checkout rc
+    commit id: "RC Start"
+    checkout develop
+    merge rc id: "PR to RC" type: HIGHLIGHT tag: "QA Review"
+
+    branch hotfix/def
+    checkout hotfix/def
+    commit id: "Hot Fix"
+    checkout main
+    merge hotfix/def id: "Hotfix PR to main" type: HIGHLIGHT tag: "Customer Review"
+
+    merge rc id: "Release" type: HIGHLIGHT tag: "Customer Review"
