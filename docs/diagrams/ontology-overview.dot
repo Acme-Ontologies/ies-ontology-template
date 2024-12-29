@@ -7,25 +7,35 @@ digraph ontology {
        label="IES Core";
        style=dashed;
        Entity [fillcolor=lightblue];
+
+       // Properties
+       hasRelation [shape=diamond, fillcolor=pink];
+       hasValue [shape=diamond, fillcolor=yellow];
    }
 
    // Domain namespaces
    subgraph cluster_domain {
-       label="IES Domain";
+       label="IES Domain Ontology";
        style=dashed;
        MyDomainEntity [fillcolor=lightgreen];
+
+       // Properties
+       hasDomainRelation [shape=diamond, fillcolor=pink];
+       hasDomainValue [shape=diamond, fillcolor=yellow];
+
    }
 
    // Class hierarchies
    MyDomainEntity -> Entity [label="rdfs:subClassOf"];
 
-   // Properties
-   hasRelation [shape=diamond, fillcolor=pink];
-   hasValue [shape=diamond, fillcolor=yellow];
-
    // Property connections
-   hasRelation -> MyDomainEntity [label="rdfs:domain"];
-   hasRelation -> MyDomainEntity [label="rdfs:range"];
-   hasValue -> MyDomainEntity [label="rdfs:domain"];
+   hasRelation -> Entity [label="rdfs:domain"];
+   hasRelation -> Entity [label="rdfs:range"];
+   hasValue -> Entity [label="rdfs:domain"];
+   hasDomainRelation -> MyDomainEntity [label="rdfs:domain"];
+   hasDomainRelation -> MyDomainEntity [label="rdfs:range"];
+   hasDomainRelation -> hasRelation [label="rdfs:subproperty"];
+   hasDomainValue -> MyDomainEntity [label="rdfs:domain"];
+   hasDomainValue -> hasValue [label="rdfs:subproperty"];
 }
 

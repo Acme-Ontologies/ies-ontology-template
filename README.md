@@ -174,7 +174,7 @@ If there are updates, review the new PR and merge it into the local repository.
 
 ## IES Core
 
-**DO NOT CHANGE IES CORE form this repository. Instead, go directly to IES Core repo and use the development workflow to propose changes for PR and review**
+**DO NOT CHANGE IES CORE from this repository. Instead, go directly to IES Core repo and use the development workflow to propose changes for PR and review**
 
 This ontology repository uses IES Core as a submodule. To update IES Core, run the following commands:
 
@@ -207,7 +207,7 @@ This repository uses GitHub Actions for CI/CD. The build artifacts are stored in
 
 We follow DRY (Don't Repeat Yourself) principles, meaning, for example, that ontology files are always mastered in `.ttl` files, and other RDF formats are generated from these files and stored in `./build/`.
 
-See the [Builds guidance][build-readme] for more details.
+See the [Build tools][build-tools-readme] and [Builds guidance][build-readme] for more details.
 
 ## Contributing
 Please see [Contributing Guide][docs-contrib] for guidelines on how to contribute to this ontology project.
@@ -238,6 +238,7 @@ Current version information is maintained in the [VERSION][VERSION] file.
 GOV.UK Pay aims to stay secure for everyone. If you are a security researcher and have discovered a security vulnerability in this repository, we appreciate your help in disclosing it to us in a responsible manner. Please refer to our [vulnerability disclosure policy][vul] and our [security.txt][sec] file for details.
 
 [build-readme]: build/README.md
+[build-tools-readme]: ies-tools/src/build/README.md
 [CHANGELOG]: CHANGELOG.md
 [commit-readme]: docs/COMMITIZEN.md
 [copyright]: https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/

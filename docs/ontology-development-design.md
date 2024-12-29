@@ -1,215 +1,282 @@
-# Ontology Development Design Document
+# IES Ontology Family - Design and Development Guide
 
-## Project Overview
+## ToDo
 
-### ToDo
+- [ ] Add DOCUMENT_ID and DOCUMENT_DRAFT_STATUS_ID to project secrets
+- [ ] Note to add the `ACME-ONTOLOGIES-PAT` token as a repo secret for each domain ontology repo
+- [ ] Add ies-core as submodule to all domain ontologies; can it be done automatically? Or using a one-off workflow or just script (yes, use a just script to add the submodule)
+- [ ] Make issue-feature work in a domain ontology repo
+- [ ] Make issue-bug work in a domain ontology repo
+- [ ] Make issue-doc work in a domain ontology repo
+- [ ] Make ontology-qa-review work in a domain ontology repo
+- [ ] Make ontology-release-candidate work in a domain ontology repo
+- [ ] Make ontology-validation work in a domain ontology repo
+- [ ] Add a CONTRIBUTING.md file to the domain ontology repo
+- [ ] Create the CHANGELOG.md file, as example
+- [ ] Add Crown copyright notice to the LICENSE file
+- [ ] Wrap feature commits and issue comments together in a workflow
+- [ ] TBD
+
 
-  - [ ] Add DOCUMENT_ID and DOCUMENT_DRAFT_STATUS_ID to project secrets
-  - [ ] Note to add the `ACME-ONTOLOGIES-PAT` token as a repo secret for each domain ontology repo
-  - [ ] Add ies-core as submodule to all domain ontologies; can it be done automatically? Or using a one-off workflow or just script (yes, use a just script to add the submodule)
-  - [ ] Make issue-feature work in a domain ontology repo
-  - [ ] Make issue-bug work in a domain ontology repo
-  - [ ] Make issue-doc work in a domain ontology repo
-  - [ ] Make ontology-qa-review work in a domain ontology repo
-  - [ ] Make ontology-release-candidate work in a domain ontology repo
-  - [ ] Make ontology-validation work in a domain ontology repo
-  - [ ] Add a CONTRIBUTING.md file to the domain ontology repo
-  - [ ] Create the CHANGELOG.md file, as example
-  - [ ] Add Crown copyright notice to the LICENSE file
-  - [ ] Wrap feature commits and issue comments together in a workflow
-  - [ ] TBD
-
-
-### Purpose and Scope
-This ontology aims to provide a standardized vocabulary for the domain. It covers key concepts and relationships.
-
-### Target Users/Stakeholders
-Primary users include domain experts, data scientists, and application developers who need to work with domain data.
-
-### Use Cases
-Key use cases include data integration, knowledge representation, and semantic search capabilities.
-
-### Competency Questions
-List of questions the ontology must be able to answer, driving the development of terms and relationships.
-
-## Domain Ontology Structure
-
-### Directory Structure
-Project follows a standardized directory structure supporting development, testing, and documentation needs.
-
-### File Organization
-Files are organized by type and purpose, with clear separation of concerns.
-
-### Naming Conventions
-Standardized naming patterns for files, classes, properties, and instances.
-
-### URI/IRI Patterns
-Defined patterns for URI/IRI construction ensuring consistency and maintainability.
-
-### Modularization Strategy
-Approach to breaking down the ontology into manageable, maintainable modules.
-
-## Development Methodology
-
-### Development Lifecycle
-Iterative development process with defined stages from conception to deployment.
-
-### Design Patterns and Guidelines
-Standard patterns and best practices for ontology development.
-
-### Reuse Strategy
-Strategy for incorporating existing ontologies and managing dependencies.
-
-### Tool Selection
-Selected tools and technologies for development, testing, and deployment.
-
-## Versioning
-
-### Version Numbering Scheme
-Semantic versioning approach adapted for ontology development.
-
-### Version Control Workflow
-Git-based workflow for managing changes and versions.
-
-### Changelog Management
-Process for maintaining and updating change history.
-
-### Deprecation Policy
-Guidelines for deprecating and removing terms.
-
-### Backward Compatibility
-Requirements and guidelines for maintaining compatibility across versions.
-
-## Workflows
-
-### Development Workflow
-Step-by-step process for making and reviewing changes.
-
-### Issue Tracking
-Process for managing bugs, features, and improvements.
-
-### Pull Request Process
-Guidelines for submitting and reviewing changes.
-
-### Review Requirements
-Criteria and process for code review and approval.
-
-### CI/CD Pipeline
-Automated testing and deployment pipeline configuration.
-
-## Testing Framework
-
-### Test Types and Organization
-Different types of tests and their organization within the project.
-
-### Validation Approach
-Methods for validating ontology consistency and correctness.
-
-### Quality Metrics
-Defined metrics for measuring ontology quality.
-
-### Test Coverage Requirements
-Required coverage levels for different types of tests.
-
-### Acceptance Criteria
-Criteria for accepting new changes into the ontology.
-
-## Release Management
-
-### Release Process
-Step-by-step process for creating and publishing releases.
-
-### QA Stages
-Quality assurance stages and requirements.
-
-### Release Candidate Criteria
-Requirements for promoting changes to release candidate status.
-
-### Publication Process
-Process for publishing new versions of the ontology.
-
-### Distribution Channels
-Methods and platforms for distributing the ontology.
-
-## Documentation Requirements
-
-### Documentation Types
-Different types of documentation required for the project.
-
-### API Documentation
-Documentation requirements for programmatic interfaces.
-
-### Usage Guides
-Guidelines for creating user documentation.
-
-### Example Implementations
-Requirements for providing usage examples.
-
-### Maintenance Guidelines
-Guidelines for maintaining and updating documentation.
-
-## Quality Assurance
-
-### Quality Criteria
-Defined criteria for measuring ontology quality.
-
-### Review Process
-Process for reviewing and ensuring quality.
-
-### Validation Requirements
-Required validation checks and processes.
-
-### Performance Benchmarks
-Performance requirements and testing approach.
-
-### Compliance Checks
-Checks for ensuring compliance with standards and requirements.
-
-## Maintenance and Governance
-
-### Maintenance Schedule
-Regular maintenance activities and schedule.
-
-### Contribution Guidelines
-Guidelines for contributing to the ontology.
-
-### Governance Model
-Structure and process for project governance.
-
-### Issue Resolution
-Process for resolving conflicts and issues.
-
-### Community Engagement
-Approach to engaging with the user community.
-
-## Technical Implementation
-
-### Tooling Requirements
-Required tools and technologies.
-
-### Build Process
-Process for building and packaging the ontology.
-
-### Deployment Strategy
-Strategy for deploying new versions.
-
-### Integration Requirements
-Requirements for integrating with other systems.
-
-### Performance Considerations
-Performance requirements and optimization strategies.
-
-## Security and Access Control
-
-### Access Management
-Managing access to ontology resources.
-
-### Permissions Model
-Roles and permissions for different users.
-
-### Security Considerations
-Security requirements and measures.
-
-### Data Privacy Requirements
-Requirements for handling sensitive data.
-
+# 1. Overview
+
+## 1.1. Introduction to IES Ontologies
+
+The IES Ontology family is a collection of interconnected ontologies designed to model and represent knowledge across various industrial and enterprise system domains. At its foundation is the IES Core ontology, which provides common concepts, patterns, and relationships that are extended by domain-specific ontologies.
+
+### Architecture Overview
+
+#### Visual Overview
+
+The following diagram illustrates the core architecture of the IES Ontology family, showing the relationship between IES Core concepts and domain-specific extensions:
+
+![IES Ontology Overview](../build/docs/diagrams/ontology-overview.svg)
+
+Key elements in the diagram:
+- Blue boxes represent core concepts from IES Core
+- Green boxes represent domain-specific extensions
+- Pink diamonds represent object properties (relations between entities)
+- Yellow diamonds represent data properties (entity attributes)
+- Arrows show inheritance and property relationships
+
+The diagram demonstrates how domain ontologies extend core concepts while maintaining a clear separation of concerns.
+
+The ontology family follows a modular architecture:
+
+1. **IES Core Ontology**
+   - Serves as the upper ontology for the entire family
+   - Defines fundamental concepts and relationships
+   - Establishes common patterns for domain extensions
+   - Provides base classes and properties for reuse
+   - Maintains consistency across all domain ontologies
+
+2. **Domain Ontologies**
+   - IES Building: Models building structures, spaces, and systems
+   - IES Infrastructure: Represents infrastructure assets and networks
+   - IES Security: Defines security concepts and controls
+   - IES People: Models organizational structures and roles
+   - IES Transport: Represents transportation systems and networks
+
+Each domain ontology imports IES Core as a Git submodule, ensuring consistency in the base concepts while allowing domain-specific extensions and specializations.
+
+### Design Philosophy
+
+The IES Ontology family adheres to these core principles:
+- Modularity: Clear separation between core and domain concepts
+- Reusability: Common patterns defined in IES Core
+- Consistency: Standardized development and maintenance processes
+- Quality: Rigorous testing and validation requirements
+- Maintainability: Automated tooling and standardized workflows
+
+## 1.2. Ontology Structure
+
+### 1.2.1. IES Core
+
+IES Core serves as the foundation for all domain ontologies. It provides:
+- Basic entity types and relationships
+- Common design patterns
+- Reusable property definitions
+- Extension points for domain specialization
+- Validation rules and constraints
+
+Key features:
+- Maintained in a dedicated repository
+- Versioned independently of domain ontologies
+- Imported by all domain ontologies as a Git submodule
+- Changes managed through a strict review process
+
+### 1.2.2. Domain Ontologies
+
+Each domain ontology extends IES Core with specialized concepts and relationships. Domain ontologies:
+- Import IES Core as a Git submodule
+- Define domain-specific classes and properties
+- Implement domain patterns and rules
+- Maintain their own versioning
+- Follow standardized development processes
+
+## 1.3. Licensing and Copyright
+
+### License Terms
+The IES Ontology family is released under the MIT License, chosen for its permissive terms and broad compatibility. This allows:
+- Commercial use
+- Modification and distribution
+- Private use
+- Sublicensing
+
+### Copyright Management
+- Copyright notices maintained in each ontology file
+- Clear attribution requirements
+- Year and copyright holder information
+- Contribution guidelines
+
+## 1.4. Project Management
+
+### Version Control
+- Semantic versioning (MAJOR.MINOR.PATCH)
+- Version tracked in VERSION file
+- Changes documented in CHANGELOG.md
+- Git tags for release versions
+
+### Change Management
+The CHANGELOG.md file tracks:
+- Added features and concepts
+- Modified relationships and properties
+- Deprecated terms
+- Breaking changes
+- Bug fixes
+
+### Dependencies
+Managed through:
+- catalog.xml for ontology imports
+- imports/dependencies.txt for explicit dependency listing
+- Git submodules for IES Core integration
+
+### Project Tracking
+Each repository includes:
+- GitHub Project board for issue/PR tracking
+- Milestone management
+- Label system for categorization
+- Automated workflow integration
+
+This infrastructure ensures consistent development practices and maintains high quality across the entire ontology family while enabling efficient collaboration among team members.
+
+## 2. GitHub Organization Setup
+### 2.1. IES-Org Configuration
+- Organization structure
+- Teams and roles
+- Permission levels
+- Required GitHub plan features
+
+### 2.2. Access Management
+- PAT configuration (IES-ORG-PAT)
+- Organization secrets
+- Repository secrets
+- Environment variables
+
+### 2.3. Repository Template
+- Standard repository structure
+- Directory organization
+- Configuration files
+- Required files and their purposes
+
+## 3. Development Infrastructure
+### 3.1. Repository Creation and Setup
+- Using create-ontology-repo.yml
+- Repository initialization process
+- Project board setup
+- Label configuration
+- Branch protection rules
+
+### 3.2. GitHub Projects Integration
+- Project board structure
+- Issue tracking
+- PR management
+- Automation rules
+
+### 3.3. Common Tools and Workflows
+- ies-tools overview
+- GitHub workflow automation
+- Tool synchronization process
+- Local development setup
+
+## 4. Development Process
+### 4.1. Branch Flow Strategy
+- Branch types and purposes
+- Branch naming conventions
+- Branch lifetime management
+- Branch protection rules
+
+### 4.2. Development Workflow
+- Feature development process
+- Bug fix process
+- Hotfix process
+- Code review requirements
+- Testing requirements
+
+### 4.3. Quality Assurance
+- QA review process
+- Validation requirements
+- Testing guidelines
+- Documentation requirements
+
+### 4.4. Release Management
+- Release candidate process
+- Version tagging
+- Release notes
+- Distribution process
+
+## 5. Repository Structure
+### 5.1. Source Directory (src/)
+- Ontology file organization
+- Competency queries
+- Sample data
+- Delta tracking
+
+### 5.2. Build Directory (build/)
+- Build process
+- Output formats
+- Documentation generation
+- Release artifacts
+
+### 5.3. Test Directory (tests/)
+- Test organization
+- Test types
+- Test data management
+- Validation framework
+
+### 5.4. Documentation Directory (docs/)
+- Documentation structure
+- Required documentation
+- Diagram guidelines
+- Documentation formats
+
+### 5.5. Import Management
+- Catalog.xml configuration
+- Dependency management
+- Git submodule usage
+- Version compatibility
+
+## 6. Tools and Automation
+### 6.1. Common Workflows
+- Workflow types
+- Trigger events
+- Configuration options
+- Error handling
+
+### 6.2. Tool Maintenance
+- Update process
+- Synchronization workflow
+- Version management
+- Backward compatibility
+
+### 6.3. Local Development Tools
+- Required software
+- Configuration
+- Usage guidelines
+- Troubleshooting
+
+## 7. Best Practices and Guidelines
+### 7.1. Development Standards
+- Coding conventions
+- Documentation requirements
+- Testing requirements
+- Review process
+
+### 7.2. Quality Control
+- Validation checks
+- Review checklists
+- Common pitfalls
+- Resolution procedures
+
+### 7.3. Maintenance
+- Regular maintenance tasks
+- Update procedures
+- Deprecation process
+- Migration guidelines
+
+## Appendices
+### A. Glossary
+### B. Reference Configurations
+### C. Workflow Examples
+### D. Troubleshooting Guide
+### E. Quick Reference Guides
