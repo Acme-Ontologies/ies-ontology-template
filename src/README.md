@@ -58,6 +58,6 @@ This directory contains the core ontology files and associated resources for the
 
 [CHANGELOG]: ../CHANGELOG.md
 [CONTRIBUTING]: ../docs/CONTRIBUTING.md
-[docs-design]: ../docs/ontology-development-design.md
+[docs-design]: ../docs/ontology-design-and-development-guide
 [reqs]: ../docs/requirements/requirements.md
 [tests-readme]: ../tests/README.md
