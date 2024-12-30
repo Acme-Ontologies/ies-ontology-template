@@ -1,3 +1,6 @@
+# NOTE: THIS IS AN EXAMPLE FILE ONLY. IT IS NOT MEANT TO BE USED IN PRODUCTION.
+# YOU SHOULD PROVIDE YOUR OWN VALIDATION QUERIES.
+
 @prefix ies: <http://ies.data.gov.uk/ontology/ies#> .
 @prefix domain: <http://ies.data.gov.uk/ontology/ies-domain#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .

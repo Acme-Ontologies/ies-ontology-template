@@ -1,5 +1,8 @@
 # File: tests/unit/terms/term-tests.sparql
 
+# NOTE: THIS IS AN EXAMPLE FILE ONLY. IT IS NOT MEANT TO BE USED IN PRODUCTION.
+# YOU SHOULD PROVIDE YOUR OWN VALIDATION QUERIES.
+
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
